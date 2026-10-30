@@ -97,12 +97,12 @@ class AuditService:
         raw_results = {}
 
         try:
-            # Step A: Crawler Engine
+            # Step A: Crawler Engine (Base Discovery & Page Hierarchy)
             crawler = CrawlerEngine()
             await broadcast_audit_event(audit_id, {
                 "type": "module_started",
                 "module": "CRAWLER",
-                "percent": 20,
+                "percent": 12,
                 "message": "Crawler engine active. Discovering internal page hierarchy..."
             })
             crawl_res = await crawler.execute(target_url, {
@@ -136,130 +136,137 @@ class AuditService:
                 if idx == 0:
                     primary_page_id = page_rec.id
 
+            AuditService._persist_findings(session, audit_id, primary_page_id, crawl_res.findings)
+
             await broadcast_audit_event(audit_id, {
                 "type": "crawler_progress",
                 "discovered": audit.pages_discovered,
                 "scanned": audit.pages_scanned,
                 "current_page": target_url,
-                "percent": 28,
+                "percent": 20,
                 "message": f"Crawled {audit.pages_scanned} pages successfully."
             })
 
-            # Step B: SEO Engine
-            if "SEO" in selected_modules:
+            # Define ordered intelligence modules
+            ordered_modules = [
+                ("SEO", "SEO Intelligence & Meta", SEOEngine),
+                ("SECURITY_PASSIVE", "Passive Security & TLS Posture", PassiveSecurityEngine),
+                ("PERFORMANCE", "Core Web Vitals & Performance", PerformanceEngine),
+                ("ACCESSIBILITY", "axe-core Accessibility (WCAG 2.1/2.2 AA)", AccessibilityEngine),
+                ("RESPONSIVE", "Responsive Viewports & Overflow", ResponsiveEngine),
+                ("TECHNICAL_HEALTH", "Technical Health & Diagnostics", None),
+                ("TECHNOLOGY", "Technology Stack Detection", TechnologyEngine),
+                ("THIRD_PARTY", "Third-Party Assets & Impact", ThirdPartyEngine),
+            ]
+
+            active_modules = [
+                m for m in ordered_modules
+                if m[0] in selected_modules or (m[0] == "SECURITY_PASSIVE" and "SECURITY" in selected_modules)
+            ]
+
+            total_mods = max(1, len(active_modules))
+            span = 70.0 / total_mods
+
+            for idx, (mod_key, display_name, EngineCls) in enumerate(active_modules):
+                start_pct = int(20 + idx * span)
+                end_pct = int(20 + (idx + 1) * span)
+
                 await broadcast_audit_event(audit_id, {
                     "type": "module_started",
-                    "module": "SEO",
-                    "percent": 35,
-                    "message": "Auditing SEO metadata, heading hierarchy, and Open Graph cards..."
+                    "module": mod_key,
+                    "percent": start_pct,
+                    "message": f"Executing {display_name}..."
                 })
-                seo_engine = SEOEngine()
-                seo_res = await seo_engine.execute(target_url, {})
-                score_seo = seo_res.score
-                raw_results["SEO"] = seo_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, seo_res.findings)
+
+                mod_score = None
+                try:
+                    if mod_key == "SEO":
+                        seo_engine = SEOEngine()
+                        seo_res = await seo_engine.execute(target_url, {})
+                        score_seo = seo_res.score
+                        raw_results["SEO"] = seo_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, seo_res.findings)
+                        mod_score = score_seo
+
+                    elif mod_key in ("SECURITY_PASSIVE", "SECURITY"):
+                        sec_engine = PassiveSecurityEngine()
+                        sec_res = await sec_engine.execute(target_url, {})
+                        score_sec = sec_res.score
+                        raw_results["SECURITY_PASSIVE"] = sec_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, sec_res.findings)
+                        mod_score = score_sec
+
+                    elif mod_key == "PERFORMANCE":
+                        perf_engine = PerformanceEngine()
+                        perf_res = await perf_engine.execute(target_url, {"device_profile": audit.device_profile.value})
+                        score_perf = perf_res.score
+                        raw_results["PERFORMANCE"] = perf_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, perf_res.findings)
+                        mod_score = score_perf
+
+                    elif mod_key == "ACCESSIBILITY":
+                        a11y_engine = AccessibilityEngine()
+                        a11y_res = await a11y_engine.execute(target_url, {})
+                        score_a11y = a11y_res.score
+                        raw_results["ACCESSIBILITY"] = a11y_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, a11y_res.findings)
+                        mod_score = score_a11y
+
+                    elif mod_key == "RESPONSIVE":
+                        resp_engine = ResponsiveEngine()
+                        resp_res = await resp_engine.execute(target_url, {})
+                        raw_results["RESPONSIVE"] = resp_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, resp_res.findings)
+                        mod_score = resp_res.score
+
+                    elif mod_key == "TECHNICAL_HEALTH":
+                        score_tech = score_tech or 100.0
+                        mod_score = score_tech
+
+                    elif mod_key == "TECHNOLOGY":
+                        tech_engine = TechnologyEngine()
+                        tech_res = await tech_engine.execute(target_url, {})
+                        raw_results["TECHNOLOGY"] = tech_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, tech_res.findings)
+                        mod_score = tech_res.score
+
+                    elif mod_key == "THIRD_PARTY":
+                        tp_engine = ThirdPartyEngine()
+                        tp_res = await tp_engine.execute(target_url, {})
+                        raw_results["THIRD_PARTY"] = tp_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, tp_res.findings)
+                        mod_score = tp_res.score
+
+                except Exception as mod_err:
+                    logger.error(f"Module {mod_key} non-fatal error: {mod_err}")
+                    mod_score = None
+
                 await broadcast_audit_event(audit_id, {
                     "type": "module_completed",
-                    "module": "SEO",
-                    "score": score_seo,
-                    "percent": 45,
-                    "message": f"SEO inspection finished (Score: {score_seo or 'N/A'})."
+                    "module": mod_key,
+                    "score": mod_score,
+                    "percent": end_pct,
+                    "message": f"{display_name} complete (Score: {round(mod_score, 1) if mod_score is not None else 'N/A'})."
                 })
 
-            # Step C: Passive Security Engine
-            if "SECURITY_PASSIVE" in selected_modules or "SECURITY" in selected_modules:
-                await broadcast_audit_event(audit_id, {
-                    "type": "module_started",
-                    "module": "SECURITY_PASSIVE",
-                    "percent": 50,
-                    "message": "Auditing security headers (HSTS, CSP, X-Frame-Options) and TLS posture..."
-                })
-                sec_engine = PassiveSecurityEngine()
-                sec_res = await sec_engine.execute(target_url, {})
-                score_sec = sec_res.score
-                raw_results["SECURITY_PASSIVE"] = sec_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, sec_res.findings)
-                await broadcast_audit_event(audit_id, {
-                    "type": "module_completed",
-                    "module": "SECURITY_PASSIVE",
-                    "score": score_sec,
-                    "percent": 60,
-                    "message": f"Security headers audit finished (Score: {score_sec or 'N/A'})."
-                })
-
-            # Step D: Performance Engine (Lighthouse & Playwright)
-            if "PERFORMANCE" in selected_modules:
-                await broadcast_audit_event(audit_id, {
-                    "type": "module_started",
-                    "module": "PERFORMANCE",
-                    "percent": 65,
-                    "message": "Measuring Navigation Timing Level 2 and Core Web Vitals via headless Chromium..."
-                })
-                perf_engine = PerformanceEngine()
-                perf_res = await perf_engine.execute(target_url, {"device_profile": audit.device_profile.value})
-                score_perf = perf_res.score
-                raw_results["PERFORMANCE"] = perf_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, perf_res.findings)
-                await broadcast_audit_event(audit_id, {
-                    "type": "module_completed",
-                    "module": "PERFORMANCE",
-                    "score": score_perf,
-                    "percent": 75,
-                    "message": f"Performance telemetry complete (Score: {score_perf or 'N/A'})."
-                })
-
-            # Step E: Accessibility Engine (axe-core via Playwright)
-            if "ACCESSIBILITY" in selected_modules:
-                await broadcast_audit_event(audit_id, {
-                    "type": "module_started",
-                    "module": "ACCESSIBILITY",
-                    "percent": 78,
-                    "message": "Auditing WCAG 2.1/2.2 AA accessibility rules, contrast, and ARIA tree..."
-                })
-                a11y_engine = AccessibilityEngine()
-                a11y_res = await a11y_engine.execute(target_url, {})
-                score_a11y = a11y_res.score
-                raw_results["ACCESSIBILITY"] = a11y_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, a11y_res.findings)
-                await broadcast_audit_event(audit_id, {
-                    "type": "module_completed",
-                    "module": "ACCESSIBILITY",
-                    "score": score_a11y,
-                    "percent": 86,
-                    "message": f"Accessibility evaluation complete (Score: {score_a11y or 'N/A'})."
-                })
-
-            # Step F: Responsive Engine
-            if "RESPONSIVE" in selected_modules:
-                resp_engine = ResponsiveEngine()
-                resp_res = await resp_engine.execute(target_url, {})
-                raw_results["RESPONSIVE"] = resp_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, resp_res.findings)
-
-            # Step G: Technology Engine
-            if "TECHNOLOGY" in selected_modules:
-                tech_engine = TechnologyEngine()
-                tech_res = await tech_engine.execute(target_url, {})
-                raw_results["TECHNOLOGY"] = tech_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, tech_res.findings)
-
-            # Step H: Third-Party Dependencies
-            if "THIRD_PARTY" in selected_modules:
-                tp_engine = ThirdPartyEngine()
-                tp_res = await tp_engine.execute(target_url, {})
-                raw_results["THIRD_PARTY"] = tp_res.raw_evidence
-                AuditService._persist_findings(session, audit_id, primary_page_id, tp_res.findings)
-
-            # Step I: Domain Health
-            domain_engine = DomainEngine()
-            domain_res = await domain_engine.execute(target_url, {})
-            raw_results["DOMAIN"] = domain_res.raw_evidence
-            AuditService._persist_findings(session, audit_id, primary_page_id, domain_res.findings)
+            # Step: Domain Health
+            await broadcast_audit_event(audit_id, {
+                "type": "progress_update",
+                "percent": 92,
+                "message": "Inspecting domain health, DNS routing records, and SSL certificate..."
+            })
+            try:
+                domain_engine = DomainEngine()
+                domain_res = await domain_engine.execute(target_url, {})
+                raw_results["DOMAIN"] = domain_res.raw_evidence
+                AuditService._persist_findings(session, audit_id, primary_page_id, domain_res.findings)
+            except Exception as dom_err:
+                logger.warning(f"Domain engine non-fatal error: {dom_err}")
 
             await broadcast_audit_event(audit_id, {
                 "type": "progress_update",
-                "percent": 95,
-                "message": "Calculating transparent v1.0.0 score matrix across all measured modules..."
+                "percent": 96,
+                "message": "Synthesizing transparent v1.0.0 score matrix across all measured modules..."
             })
 
             # Calculate Overall Score using transparent versioned algorithm

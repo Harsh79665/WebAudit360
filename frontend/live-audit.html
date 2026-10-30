@@ -107,23 +107,7 @@
         <div id="stage-performance" class="stage-card">
           <div class="stage-icon"><span data-icon="gauge"></span></div>
           <div class="stage-info">
-            <div class="stage-name">Lighthouse Performance</div>
-            <div class="stage-status">Pending</div>
-          </div>
-        </div>
-
-        <div id="stage-accessibility" class="stage-card">
-          <div class="stage-icon"><span data-icon="accessibility"></span></div>
-          <div class="stage-info">
-            <div class="stage-name">axe-core Accessibility</div>
-            <div class="stage-status">Pending</div>
-          </div>
-        </div>
-
-        <div id="stage-security" class="stage-card">
-          <div class="stage-icon"><span data-icon="shield"></span></div>
-          <div class="stage-info">
-            <div class="stage-name">Security Inspection</div>
+            <div class="stage-name">Core Web Vitals & Perf</div>
             <div class="stage-status">Pending</div>
           </div>
         </div>
@@ -131,7 +115,55 @@
         <div id="stage-seo" class="stage-card">
           <div class="stage-icon"><span data-icon="search"></span></div>
           <div class="stage-info">
-            <div class="stage-name">SEO & Meta Tree</div>
+            <div class="stage-name">SEO Intelligence</div>
+            <div class="stage-status">Pending</div>
+          </div>
+        </div>
+
+        <div id="stage-accessibility" class="stage-card">
+          <div class="stage-icon"><span data-icon="accessibility"></span></div>
+          <div class="stage-info">
+            <div class="stage-name">axe-core WCAG AA</div>
+            <div class="stage-status">Pending</div>
+          </div>
+        </div>
+
+        <div id="stage-security" class="stage-card">
+          <div class="stage-icon"><span data-icon="shield"></span></div>
+          <div class="stage-info">
+            <div class="stage-name">Passive Security & TLS</div>
+            <div class="stage-status">Pending</div>
+          </div>
+        </div>
+
+        <div id="stage-responsive" class="stage-card">
+          <div class="stage-icon"><span data-icon="smartphone"></span></div>
+          <div class="stage-info">
+            <div class="stage-name">Responsive Behavior</div>
+            <div class="stage-status">Pending</div>
+          </div>
+        </div>
+
+        <div id="stage-technical" class="stage-card">
+          <div class="stage-icon"><span data-icon="alertTriangle"></span></div>
+          <div class="stage-info">
+            <div class="stage-name">Technical Health</div>
+            <div class="stage-status">Pending</div>
+          </div>
+        </div>
+
+        <div id="stage-technology" class="stage-card">
+          <div class="stage-icon"><span data-icon="cpu"></span></div>
+          <div class="stage-info">
+            <div class="stage-name">Technology Stack</div>
+            <div class="stage-status">Pending</div>
+          </div>
+        </div>
+
+        <div id="stage-third-party" class="stage-card">
+          <div class="stage-icon"><span data-icon="layers"></span></div>
+          <div class="stage-info">
+            <div class="stage-name">Third-Party Assets</div>
             <div class="stage-status">Pending</div>
           </div>
         </div>
@@ -177,7 +209,7 @@
     class SmoothProgressController {
       constructor() {
         this.currentVal = 0;
-        this.targetVal = 8;
+        this.targetVal = 6;
         this.pBar = document.getElementById("live-progress-bar");
         this.pText = document.getElementById("progress-percentage");
         this.stageLabel = document.getElementById("current-stage-label");
@@ -186,51 +218,59 @@
       }
 
       setTarget(pct, label = "") {
-        this.targetVal = Math.max(this.targetVal, Math.min(100, pct));
+        const val = Number(pct);
+        if (!isNaN(val)) {
+          this.targetVal = Math.max(this.targetVal, Math.min(100, val));
+        }
         if (label && this.stageLabel) {
           this.stageLabel.textContent = label;
         }
       }
 
       init() {
-        // Continuous smooth animation step
+        // High-precision smooth animation tick using requestAnimationFrame
         const animate = () => {
           if (this.currentVal < this.targetVal) {
-            const step = Math.max(0.15, (this.targetVal - this.currentVal) * 0.06);
+            const diff = this.targetVal - this.currentVal;
+            // Smooth ease-out interpolation step
+            const step = Math.max(0.12, diff * 0.1);
             this.currentVal = Math.min(this.targetVal, this.currentVal + step);
-            
+
             if (this.pBar) this.pBar.style.width = `${this.currentVal.toFixed(1)}%`;
             if (this.pText) this.pText.textContent = `${Math.floor(this.currentVal)}%`;
           }
+
           if (!this.isDone || this.currentVal < 100) {
             requestAnimationFrame(animate);
           }
         };
         requestAnimationFrame(animate);
-
-        // Steady gentle auto-progress up to 92% to keep experience live and fluid
-        this.ticker = setInterval(() => {
-          if (!this.isDone && this.targetVal < 92) {
-            this.targetVal += 1.8;
-          }
-        }, 800);
       }
 
       complete(onFinish) {
-        clearInterval(this.ticker);
         this.isDone = true;
         this.targetVal = 100;
-        if (this.stageLabel) this.stageLabel.textContent = "Audit pipeline complete! All measurements stored.";
+        if (this.stageLabel) {
+          this.stageLabel.textContent = "Audit pipeline complete! All measurements verified.";
+        }
 
-        const checkCompletion = setInterval(() => {
-          if (this.currentVal >= 99.4) {
+        const finalize = () => {
+          if (this.currentVal >= 99.5) {
             this.currentVal = 100;
             if (this.pBar) this.pBar.style.width = "100%";
             if (this.pText) this.pText.textContent = "100%";
-            clearInterval(checkCompletion);
             if (onFinish) onFinish();
+          } else {
+            const step = Math.max(0.4, (100 - this.currentVal) * 0.18);
+            this.currentVal = Math.min(100, this.currentVal + step);
+            if (this.pBar) this.pBar.style.width = `${this.currentVal.toFixed(1)}%`;
+            if (this.pText) this.pText.textContent = `${Math.floor(this.currentVal)}%`;
+            requestAnimationFrame(finalize);
           }
-        }, 40);
+        };
+        requestAnimationFrame(finalize);
+      }
+    }
       }
     }
 
@@ -299,6 +339,29 @@
         const titleEl = document.getElementById("audit-target-title");
         if (titleEl) titleEl.textContent = audit.target_url;
 
+        // Dim modules that were not selected for this run
+        const selected = new Set(audit.selected_modules || []);
+        const allModuleCards = [
+          { key: "PERFORMANCE", id: "stage-performance" },
+          { key: "SEO", id: "stage-seo" },
+          { key: "ACCESSIBILITY", id: "stage-accessibility" },
+          { key: "SECURITY_PASSIVE", id: "stage-security" },
+          { key: "RESPONSIVE", id: "stage-responsive" },
+          { key: "TECHNICAL_HEALTH", id: "stage-technical" },
+          { key: "TECHNOLOGY", id: "stage-technology" },
+          { key: "THIRD_PARTY", id: "stage-third-party" },
+        ];
+        allModuleCards.forEach(item => {
+          if (!selected.has(item.key) && !(item.key === "SECURITY_PASSIVE" && selected.has("SECURITY"))) {
+            const el = document.getElementById(item.id);
+            if (el) {
+              el.style.opacity = "0.45";
+              const st = el.querySelector(".stage-status");
+              if (st) st.textContent = "Skipped";
+            }
+          }
+        });
+
         // If already completed or failed, show immediate finished state
         if (audit.status === "COMPLETED" || audit.status === "FAILED") {
           handleJobFinished(audit.status, auditId, "", audit.overall_score);
@@ -352,42 +415,45 @@
         progressController.setTarget(evt.percent, evt.message || "");
       }
 
+      const moduleMap = {
+        "CRAWLER": "stage-crawler",
+        "PERFORMANCE": "stage-performance",
+        "SEO": "stage-seo",
+        "ACCESSIBILITY": "stage-accessibility",
+        "SECURITY_PASSIVE": "stage-security",
+        "SECURITY": "stage-security",
+        "RESPONSIVE": "stage-responsive",
+        "TECHNICAL_HEALTH": "stage-technical",
+        "TECHNOLOGY": "stage-technology",
+        "THIRD_PARTY": "stage-third-party",
+        "DOMAIN": "stage-scoring",
+        "SCORING": "stage-scoring"
+      };
+
       if (type === "audit_started") {
         if (badge) badge.textContent = "RUNNING";
-        if (progressController) progressController.setTarget(12, "Target validated. Initializing headless scanning sandbox...");
+        if (progressController) progressController.setTarget(10, "Target validated. Initializing scanning sandbox...");
         addLogEntry(`Scan worker started execution for ${evt.target_url || "target"}`);
       } else if (type === "crawler_progress") {
         document.getElementById("pages-discovered").textContent = evt.discovered || 0;
         document.getElementById("pages-scanned").textContent = evt.scanned || 0;
-        addLogEntry(`Crawler scanned page: ${evt.current_page || ""}`);
+        addLogEntry(`Crawler scanned page: ${evt.current_page || ""} (Found ${evt.discovered || 1} links)`);
         updateStage("stage-crawler", "completed", `Crawled (${evt.scanned} pages)`);
-        if (progressController) progressController.setTarget(28, `Discovered ${evt.discovered || 1} pages.`);
+        if (progressController) progressController.setTarget(20, `Discovered ${evt.discovered || 1} internal pages.`);
       } else if (type === "progress_update") {
         if (evt.percent >= 90) {
-          updateStage("stage-scoring", "running", "Calculating Score Matrix...");
+          updateStage("stage-scoring", "running", "Synthesizing scores...");
         }
+        if (evt.message) addLogEntry(evt.message);
       } else if (type === "module_started") {
-        const moduleMap = {
-          "PERFORMANCE": "stage-performance",
-          "ACCESSIBILITY": "stage-accessibility",
-          "SECURITY_PASSIVE": "stage-security",
-          "SEO": "stage-seo",
-          "CRAWLER": "stage-crawler"
-        };
         const stageId = moduleMap[evt.module];
-        if (stageId) updateStage(stageId, "running", "Executing...");
-        addLogEntry(`Engine started: ${evt.module}`);
+        if (stageId) updateStage(stageId, "running", "Analyzing...");
+        addLogEntry(`Engine started: ${evt.module} — ${evt.message || "Executing analysis..."}`);
       } else if (type === "module_completed") {
-        const moduleMap = {
-          "PERFORMANCE": "stage-performance",
-          "ACCESSIBILITY": "stage-accessibility",
-          "SECURITY_PASSIVE": "stage-security",
-          "SEO": "stage-seo",
-          "CRAWLER": "stage-crawler"
-        };
         const stageId = moduleMap[evt.module];
-        if (stageId) updateStage(stageId, "completed", "Completed");
-        addLogEntry(`Engine finished: ${evt.module} (Score: ${evt.score !== null && evt.score !== undefined ? evt.score : "N/A"})`);
+        const scoreLabel = evt.score !== null && evt.score !== undefined ? `Score: ${Math.round(evt.score)}/100` : "Complete";
+        if (stageId) updateStage(stageId, "completed", scoreLabel);
+        addLogEntry(`Engine completed: ${evt.module} (${scoreLabel})`);
       } else if (type === "audit_completed") {
         updateStage("stage-scoring", "completed", "Scores Calculated");
         handleJobFinished("COMPLETED", auditId, "", evt.overall_score);

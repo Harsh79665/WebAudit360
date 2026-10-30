@@ -128,8 +128,11 @@ async def get_audit(audit_id: int, session: AsyncSession = Depends(get_db)):
         "SECURITY": audit.score_security,
         "SECURITY_PASSIVE": audit.score_security,
         "TECHNICAL": audit.score_technical,
+        "TECHNICAL_HEALTH": audit.score_technical,
         "DOMAIN": 100.0 if not any(f.category == "DOMAIN" and f.severity.value in ("HIGH", "CRITICAL") for f in findings_list) else 70.0,
         "RESPONSIVE": 100.0 if not any(f.category == "RESPONSIVE" and f.severity.value in ("HIGH", "CRITICAL") for f in findings_list) else 75.0,
+        "TECHNOLOGY": 100.0 if not any(f.category == "TECHNOLOGY" and f.severity.value in ("HIGH", "CRITICAL") for f in findings_list) else 80.0,
+        "THIRD_PARTY": 100.0 if not any(f.category == "THIRD_PARTY" and f.severity.value in ("HIGH", "CRITICAL") for f in findings_list) else 75.0,
     }
 
     return AuditDetailResponse(

@@ -50,8 +50,8 @@ export async function loadTechnicalData(auditId) {
 
   try {
     const audit = await apiClient.get(`/audits/${auditId}`);
-    const techFindings = (audit.findings || []).filter(f => f.category === "TECHNICAL" || f.category === "CRAWLER");
-    const techScore = audit.category_scores ? audit.category_scores.TECHNICAL : null;
+    const techFindings = (audit.findings || []).filter(f => f.category === "TECHNICAL" || f.category === "TECHNICAL_HEALTH" || f.category === "CRAWLER");
+    const techScore = audit.category_scores ? (audit.category_scores.TECHNICAL ?? audit.category_scores.TECHNICAL_HEALTH ?? audit.score_technical) : audit.score_technical;
     const scoreObj = getScoreDetails(techScore);
 
     let html = `

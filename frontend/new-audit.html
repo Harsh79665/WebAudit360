@@ -98,8 +98,16 @@
             <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">1. Target Website</h2>
             <div class="form-group">
               <label for="target-url" class="form-label">Website URL</label>
-              <input type="url" id="target-url" class="form-input" placeholder="https://example.com" required>
-              <span class="form-helper">Must be a publicly accessible HTTP/HTTPS domain. SSRF protection is enforced.</span>
+              <div class="flex gap-sm">
+                <input type="url" id="target-url" class="form-input" placeholder="https://example.com" required style="flex: 1;">
+              </div>
+              <span class="form-helper">Must be a publicly accessible HTTP/HTTPS domain. SSRF protection is strictly enforced.</span>
+              
+              <!-- Quick Presets -->
+              <div class="flex items-center gap-xs" style="margin-top: var(--space-sm); flex-wrap: wrap;">
+                <span class="text-xs text-muted">Quick Target:</span>
+                <button type="button" class="btn btn-secondary btn-xs preset-btn" data-url="https://harsh-portfolio-delta-umber.vercel.app/">Harsh Patel Portfolio</button>
+              </div>
             </div>
           </div>
 
@@ -147,70 +155,102 @@
 
           <!-- Step 3: Module Selection -->
           <div class="audit-setup-card">
-            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-xs);">3. Audit Modules</h2>
-            <p class="text-muted small-text">Select which technical intelligence engines to execute during this run.</p>
+            <div class="flex items-center justify-between" style="margin-bottom: var(--space-xs); flex-wrap: wrap; gap: var(--space-sm);">
+              <div>
+                <h2 style="font-size: 1.25rem; font-weight: 700;">3. Audit Modules</h2>
+                <p class="text-muted small-text">Select which technical intelligence engines to execute during this run.</p>
+              </div>
+              <div class="flex gap-xs">
+                <button type="button" id="btn-select-all-modules" class="btn btn-secondary btn-xs">Select All</button>
+                <button type="button" id="btn-clear-modules" class="btn btn-secondary btn-xs">Clear All</button>
+              </div>
+            </div>
 
             <div class="module-selection-grid">
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="PERFORMANCE">
                 <input type="checkbox" name="modules" value="PERFORMANCE" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Performance</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Performance</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">Playwright + Lab</span>
+                  </div>
                   <span class="module-checkbox-desc">Lighthouse Core Web Vitals & lab diagnostics</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="SEO">
                 <input type="checkbox" name="modules" value="SEO" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">SEO Intelligence</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">SEO Intelligence</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">Search Meta</span>
+                  </div>
                   <span class="module-checkbox-desc">Meta tags, canonicals, robots.txt, headings</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="ACCESSIBILITY">
                 <input type="checkbox" name="modules" value="ACCESSIBILITY" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Accessibility</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Accessibility</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">axe-core 4.10</span>
+                  </div>
                   <span class="module-checkbox-desc">axe-core WCAG 2.1/2.2 AA rules & selectors</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="SECURITY_PASSIVE">
                 <input type="checkbox" name="modules" value="SECURITY_PASSIVE" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Passive Security</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Passive Security</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">TLS & Headers</span>
+                  </div>
                   <span class="module-checkbox-desc">HSTS, CSP, TLS cipher suites, cookie flags</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="RESPONSIVE">
                 <input type="checkbox" name="modules" value="RESPONSIVE" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Responsive Behavior</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Responsive Behavior</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">Headless 3-VP</span>
+                  </div>
                   <span class="module-checkbox-desc">Horizontal overflow & touch target sizing</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="TECHNICAL_HEALTH">
                 <input type="checkbox" name="modules" value="TECHNICAL_HEALTH" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Technical Health</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Technical Health</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">HTTP & JS Errors</span>
+                  </div>
                   <span class="module-checkbox-desc">Broken links, console errors, JS exceptions</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="TECHNOLOGY">
                 <input type="checkbox" name="modules" value="TECHNOLOGY" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Technology Stack</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Technology Stack</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">Stack Classifier</span>
+                  </div>
                   <span class="module-checkbox-desc">Framework, CDN, & web server detection</span>
                 </div>
               </label>
 
-              <label class="module-checkbox-card selected">
+              <label class="module-checkbox-card selected" data-module="THIRD_PARTY">
                 <input type="checkbox" name="modules" value="THIRD_PARTY" checked>
-                <div class="module-checkbox-label">
-                  <span class="module-checkbox-title">Third-Party Assets</span>
+                <div class="module-checkbox-label" style="width: 100%;">
+                  <div class="flex items-center justify-between" style="margin-bottom: 2px;">
+                    <span class="module-checkbox-title">Third-Party Assets</span>
+                    <span class="badge score-excellent" style="font-size: 0.65rem; padding: 2px 6px;">Asset Isolation</span>
+                  </div>
                   <span class="module-checkbox-desc">External scripts, trackers, & font impact</span>
                 </div>
               </label>
@@ -265,6 +305,13 @@
         }
       });
 
+      // Handle preset buttons
+      document.querySelectorAll(".preset-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.getElementById("target-url").value = btn.getAttribute("data-url");
+        });
+      });
+
       // Handle card checkbox visual toggle
       const checkboxes = document.querySelectorAll(".module-checkbox-card input[type='checkbox']");
       checkboxes.forEach((cb) => {
@@ -277,6 +324,26 @@
           }
         });
       });
+
+      // Handle Select All / Clear All modules
+      const selectAllBtn = document.getElementById("btn-select-all-modules");
+      const clearAllBtn = document.getElementById("btn-clear-modules");
+      if (selectAllBtn) {
+        selectAllBtn.addEventListener("click", () => {
+          checkboxes.forEach(cb => {
+            cb.checked = true;
+            cb.closest(".module-checkbox-card").classList.add("selected");
+          });
+        });
+      }
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener("click", () => {
+          checkboxes.forEach(cb => {
+            cb.checked = false;
+            cb.closest(".module-checkbox-card").classList.remove("selected");
+          });
+        });
+      }
 
       // Handle Form Submit
       const form = document.getElementById("audit-config-form");

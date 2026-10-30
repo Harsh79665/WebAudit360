@@ -205,8 +205,14 @@ class PerformanceEngine(BaseAuditEngine):
                 )
                 page = await browser.new_page(viewport={"width": 1280, "height": 800})
                 t0 = time.time()
-                await page.goto(url, wait_until="load", timeout=20000)
-                load_time_ms = int((time.time() - t0) * 1000)
+                try:
+                    await page.goto(url, wait_until="load", timeout=12000)
+                except Exception:
+                    try:
+                        await page.goto(url, wait_until="domcontentloaded", timeout=8000)
+                    except Exception:
+                        pass
+                load_time_ms = max(50, int((time.time() - t0) * 1000))
 
                 timing = await page.evaluate("""() => {
                     const nav = performance.getEntriesByType('navigation')[0];
@@ -228,19 +234,34 @@ class PerformanceEngine(BaseAuditEngine):
 
     async def _run_lighthouse(self, url: str, device_profile: str) -> Optional[Dict[str, Any]]:
         """Invokes Lighthouse CLI and parses output JSON."""
+        npx_bin = shutil.which("lighthouse") or shutil.which("npx")
+        if not npx_bin:
+            return None
+
         form_factor = "desktop" if device_profile == "DESKTOP" else "mobile"
         temp_dir = tempfile.mkdtemp()
         output_path = os.path.join(temp_dir, "lighthouse_result.json")
 
-        cmd = [
-            "npx", "--yes", "lighthouse", url,
-            "--output=json",
-            f"--output-path={output_path}",
-            f"--form-factor={form_factor}",
-            "--chrome-flags=--headless --no-sandbox --disable-gpu",
-            "--only-categories=performance",
-            "--quiet"
-        ]
+        if os.name == "nt" and npx_bin.lower().endswith((".cmd", ".bat")):
+            cmd = [
+                os.environ.get("COMSPEC", "cmd.exe"), "/c", npx_bin, "--yes", "lighthouse", url,
+                "--output=json",
+                f"--output-path={output_path}",
+                f"--form-factor={form_factor}",
+                "--chrome-flags=--headless --no-sandbox --disable-gpu",
+                "--only-categories=performance",
+                "--quiet"
+            ]
+        else:
+            cmd = [
+                npx_bin, "--yes", "lighthouse", url,
+                "--output=json",
+                f"--output-path={output_path}",
+                f"--form-factor={form_factor}",
+                "--chrome-flags=--headless --no-sandbox --disable-gpu",
+                "--only-categories=performance",
+                "--quiet"
+            ]
 
         try:
             process = await asyncio.create_subprocess_exec(

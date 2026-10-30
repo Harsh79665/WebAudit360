@@ -1,0 +1,128 @@
+/* WebAudit 360 — Design System Variables & Tokens
+ * Creator: Harsh Patel
+ * Supports: Classic White Default (Light) and Premium Spatial Navy (Dark)
+ */
+
+:root {
+  /* Color Palette - Light Theme (Classic White Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-card: rgba(255, 255, 255, 0.7);
+  --border-color: #e2e8f0;
+  --border-subtle: #edf2f7;
+  --border-focus: #2563eb;
+
+  /* Typography Colors */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-on-accent: #ffffff;
+
+  /* Brand Accents */
+  --accent-primary: #2563eb;       /* Royal Blue */
+  --accent-primary-hover: #1d4ed8;
+  --accent-secondary: #06b6d4;     /* Cyan */
+  --accent-secondary-hover: #0891b2;
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  --accent-glow: rgba(37, 99, 235, 0.15);
+
+  /* Status & Severity Colors */
+  --color-excellent: #10b981;      /* 90-100 */
+  --color-good: #3b82f6;           /* 75-89 */
+  --color-warning: #f59e0b;        /* 50-74 Needs Improvement */
+  --color-poor: #f97316;           /* 25-49 Poor */
+  --color-critical: #ef4444;       /* 0-24 Critical */
+  --color-info: #64748b;
+
+  --badge-excellent-bg: rgba(16, 185, 129, 0.1);
+  --badge-excellent-text: #059669;
+  --badge-good-bg: rgba(59, 130, 246, 0.1);
+  --badge-good-text: #2563eb;
+  --badge-warning-bg: rgba(245, 158, 11, 0.1);
+  --badge-warning-text: #d97706;
+  --badge-poor-bg: rgba(249, 115, 22, 0.1);
+  --badge-poor-text: #ea580c;
+  --badge-critical-bg: rgba(239, 68, 68, 0.1);
+  --badge-critical-text: #dc2626;
+
+  /* Spacing Tokens */
+  --space-2xs: 0.25rem;  /* 4px */
+  --space-xs: 0.5rem;    /* 8px */
+  --space-sm: 0.75rem;   /* 12px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+
+  /* Border Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-capsule: 9999px; /* Capsule buttons & inputs */
+
+  /* Shadows & Depth */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --shadow-spatial: 0 20px 40px -15px rgba(37, 99, 235, 0.1), 0 0 15px rgba(6, 182, 212, 0.05);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slide: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout Breakpoints */
+  --container-max: 1280px;
+  --navbar-height: 72px;
+  --sidebar-width: 280px;
+}
+
+/* Spatial Dark Mode */
+[data-theme="dark"] {
+  --bg-primary: #0a0f1d;          /* Deep Navy Base */
+  --bg-secondary: #0f172a;        /* Elevated Navy Surface */
+  --bg-tertiary: #1e293b;         /* Component Navy */
+  --bg-surface: #131d35;          /* Panel Navy */
+  --bg-card: rgba(19, 29, 53, 0.8);
+  --bg-glass: rgba(15, 23, 42, 0.85);
+  --bg-glass-card: rgba(19, 29, 53, 0.65);
+  --border-color: #1e2e4f;
+  --border-subtle: #17243e;
+  --border-focus: #38bdf8;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #60a5fa;
+  --accent-secondary: #06b6d4;
+  --accent-secondary-hover: #22d3ee;
+  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  --accent-glow: rgba(56, 189, 248, 0.2);
+
+  --badge-excellent-bg: rgba(16, 185, 129, 0.15);
+  --badge-excellent-text: #34d399;
+  --badge-good-bg: rgba(59, 130, 246, 0.15);
+  --badge-good-text: #60a5fa;
+  --badge-warning-bg: rgba(245, 158, 11, 0.15);
+  --badge-warning-text: #fbbf24;
+  --badge-poor-bg: rgba(249, 115, 22, 0.15);
+  --badge-poor-text: #fb923c;
+  --badge-critical-bg: rgba(239, 68, 68, 0.15);
+  --badge-critical-text: #f87171;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-spatial: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.12);
+}

@@ -1,0 +1,40 @@
+/* WebAudit 360 — Animations & Motion Preferences */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.35); }
+}
+
+@keyframes skeletonPulse {
+  0% { background-color: var(--bg-secondary); }
+  50% { background-color: var(--border-color); }
+  100% { background-color: var(--bg-secondary); }
+}
+
+.fade-in {
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.skeleton {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .slide-menu {
+    transition: none !important;
+  }
+}

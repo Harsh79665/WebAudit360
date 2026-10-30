@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance Intelligence — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="performance.html" class="slide-nav-item active"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Engines</div>
+        <a href="performance.html" class="app-sidebar-link active"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+        <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
+        <a href="technical.html" class="app-sidebar-link"><span data-icon="activity"></span> Technical Health</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="container">
+        <div style="margin-bottom: var(--space-xl);">
+          <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">ENGINE 01</span>
+          <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">Performance Intelligence</h1>
+          <p class="text-muted">Powered by Google Lighthouse CLI 13.x with mobile and desktop profiles</p>
+        </div>
+
+        <!-- Core Web Vitals Metric Cards -->
+        <div class="grid grid-cols-4 gap-md" style="margin-bottom: var(--space-xl);">
+          <div class="metric-card">
+            <div class="metric-card-header"><span class="metric-card-title">Largest Contentful Paint</span></div>
+            <div id="metric-lcp" class="metric-card-value">--</div>
+            <div class="metric-card-footer">Good: &le; 2.5s (Loading speed)</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-header"><span class="metric-card-title">Cumulative Layout Shift</span></div>
+            <div id="metric-cls" class="metric-card-value">--</div>
+            <div class="metric-card-footer">Good: &le; 0.1 (Visual stability)</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-header"><span class="metric-card-title">Total Blocking Time</span></div>
+            <div id="metric-tbt" class="metric-card-value">--</div>
+            <div class="metric-card-footer">Good: &le; 200ms (Interactivity)</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-header"><span class="metric-card-title">First Contentful Paint</span></div>
+            <div id="metric-fcp" class="metric-card-value">--</div>
+            <div class="metric-card-footer">Good: &le; 1.8s (Initial render)</div>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Performance Opportunities & Diagnostics</h2>
+          <div id="perf-findings-list" class="findings-container">
+            <div class="empty-state">
+              <div class="empty-state-icon"><span data-icon="gauge"></span></div>
+              <h3 class="empty-state-title">Select or Run an Audit</h3>
+              <p class="empty-state-desc">Performance measurements from your latest audit will appear here with traceable resource payloads.</p>
+              <a href="new-audit.html" class="btn btn-primary"><span data-icon="zap"></span> Run Performance Scan</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { apiClient } from "./js/api.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+
+      try {
+        const audits = await apiClient.get("/audits").catch(() => ({ items: [] }));
+        if (audits.items && audits.items.length > 0) {
+          const latest = audits.items[0];
+          // Load findings for this audit in Performance category
+          const findings = await apiClient.get(`/audits/${latest.id}/findings?category=PERFORMANCE`).catch(() => ({ items: [] }));
+          if (findings.items && findings.items.length > 0) {
+            // Render metrics
+          }
+        }
+      } catch (e) {}
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="projects.html" class="slide-nav-item active"><span data-icon="layers"></span> Projects</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link active"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="container">
+        <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: var(--space-xl);">
+          <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800;">Projects & Domain Associations</h1>
+            <p class="text-muted">Organize websites, track domain ownership, and manage continuous audits</p>
+          </div>
+          <button id="create-project-btn" class="btn btn-primary btn-sm">
+            <span data-icon="layers"></span>
+            <span>Create Project</span>
+          </button>
+        </div>
+
+        <div id="projects-list-container" class="glass-panel" style="padding: var(--space-xl);">
+          <div class="empty-state">
+            <div class="empty-state-icon"><span data-icon="layers"></span></div>
+            <h3 class="empty-state-title">No Projects Created Yet</h3>
+            <p class="empty-state-desc">Create a project to group related domain audits, store visual baselines, and configure recurring monitoring.</p>
+            <button id="empty-create-btn" class="btn btn-primary"><span data-icon="layers"></span> Create First Project</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { apiClient } from "./js/api.js";
+    import { showToast, escapeHtml } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+
+      await loadProjects();
+
+      const btn1 = document.getElementById("create-project-btn");
+      const btn2 = document.getElementById("empty-create-btn");
+      const handleCreate = async () => {
+        const name = prompt("Enter Project Name:");
+        if (!name) return;
+        const domain = prompt("Enter Primary Target Domain (e.g. example.com):");
+        if (!domain) return;
+
+        try {
+          await apiClient.post("/projects", { name, domain });
+          showToast("Project Created", `Project "${name}" added successfully.`, "success");
+          await loadProjects();
+        } catch (err) {
+          showToast("Failed to Create Project", err.message, "error");
+        }
+      };
+
+      if (btn1) btn1.addEventListener("click", handleCreate);
+      if (btn2) btn2.addEventListener("click", handleCreate);
+    });
+
+    async function loadProjects() {
+      const container = document.getElementById("projects-list-container");
+      try {
+        const data = await apiClient.get("/projects").catch(() => ({ items: [] }));
+        const projects = data.items || [];
+
+        if (projects.length === 0) return;
+
+        let html = `<div class="grid grid-cols-2 gap-lg">`;
+        projects.forEach((p) => {
+          html += `
+            <div class="metric-card">
+              <div class="flex items-center justify-between" style="margin-bottom: var(--space-xs);">
+                <h3 style="font-size: 1.125rem; font-weight: 700;">${escapeHtml(p.name)}</h3>
+                <span class="badge">${escapeHtml(p.domain || "No Domain")}</span>
+              </div>
+              <p class="small-text text-muted" style="margin-bottom: var(--space-md);">Created: ${new Date(p.created_at).toLocaleDateString()}</p>
+              <div class="flex gap-sm">
+                <a href="new-audit.html?project=${p.id}" class="btn btn-secondary btn-sm">Audit Domain</a>
+                <button class="btn btn-outline btn-sm delete-project-btn" data-id="${p.id}">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+        renderIcons(container);
+
+        document.querySelectorAll(".delete-project-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            if (confirm("Delete this project?")) {
+              await apiClient.delete(`/projects/${id}`);
+              showToast("Deleted", "Project deleted.", "info");
+              await loadProjects();
+            }
+          });
+        });
+      } catch (e) {}
+    }
+  </script>
+</body>
+</html>

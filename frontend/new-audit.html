@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configure New Audit — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/audit.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle Menu"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle Theme">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <div id="nav-auth-actions"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Menu Drawer -->
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu" aria-label="Navigation Menu">
+    <div class="slide-menu-header">
+      <div class="flex items-center gap-xs">
+        <span data-icon="globe" data-icon-class="gradient-text"></span>
+        <strong>WebAudit 360</strong>
+      </div>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item active"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Monitoring</a>
+      <div class="slide-nav-divider"></div>
+      <a href="index.html" class="slide-nav-item"><span data-icon="globe"></span> Home</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <!-- Desktop Sidebar -->
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link active"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="audit-setup-container">
+        <div style="margin-bottom: var(--space-xl);">
+          <h1 style="font-size: 1.75rem; font-weight: 700;">Configure Website Audit</h1>
+          <p class="text-muted" style="margin-top: 4px;">
+            Set your target, choose measurement profiles, select modules, and define crawl boundaries.
+          </p>
+        </div>
+
+        <form id="audit-config-form">
+          <!-- Step 1: Target URL -->
+          <div class="audit-setup-card">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">1. Target Website</h2>
+            <div class="form-group">
+              <label for="target-url" class="form-label">Website URL</label>
+              <input type="url" id="target-url" class="form-input" placeholder="https://example.com" required>
+              <span class="form-helper">Must be a publicly accessible HTTP/HTTPS domain. SSRF protection is enforced.</span>
+            </div>
+          </div>
+
+          <!-- Step 2: Scan Scope & Device Profile -->
+          <div class="audit-setup-card">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">2. Scope & Profiles</h2>
+            <div class="grid grid-cols-2 gap-lg">
+              <div class="form-group">
+                <label for="scan-mode" class="form-label">Audit Mode</label>
+                <select id="scan-mode" class="form-select">
+                  <option value="SINGLE_PAGE" selected>Single-Page Audit (Exact URL only)</option>
+                  <option value="FULL_SITE">Full-Website Audit (Crawl internal links)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="device-profile" class="form-label">Measurement Profile</label>
+                <select id="device-profile" class="form-select">
+                  <option value="BOTH" selected>Both (Mobile 390px & Desktop 1440px)</option>
+                  <option value="MOBILE">Mobile Emulation (390×844)</option>
+                  <option value="DESKTOP">Desktop (1440×900)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Full-Site Crawl Limits (conditionally displayed if FULL_SITE selected) -->
+            <div id="crawl-limits-section" style="margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--border-color); display: none;">
+              <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: var(--space-sm);">Crawler Safeguards</h3>
+              <div class="grid grid-cols-3 gap-md">
+                <div class="form-group">
+                  <label for="max-pages" class="form-label">Max Pages</label>
+                  <input type="number" id="max-pages" class="form-input" value="50" min="1" max="100">
+                </div>
+                <div class="form-group">
+                  <label for="max-depth" class="form-label">Max Depth</label>
+                  <input type="number" id="max-depth" class="form-input" value="3" min="1" max="5">
+                </div>
+                <div class="form-group">
+                  <label for="concurrency" class="form-label">Concurrency</label>
+                  <input type="number" id="concurrency" class="form-input" value="2" min="1" max="4">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Module Selection -->
+          <div class="audit-setup-card">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-xs);">3. Audit Modules</h2>
+            <p class="text-muted small-text">Select which technical intelligence engines to execute during this run.</p>
+
+            <div class="module-selection-grid">
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="PERFORMANCE" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Performance</span>
+                  <span class="module-checkbox-desc">Lighthouse Core Web Vitals & lab diagnostics</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="SEO" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">SEO Intelligence</span>
+                  <span class="module-checkbox-desc">Meta tags, canonicals, robots.txt, headings</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="ACCESSIBILITY" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Accessibility</span>
+                  <span class="module-checkbox-desc">axe-core WCAG 2.1/2.2 AA rules & selectors</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="SECURITY_PASSIVE" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Passive Security</span>
+                  <span class="module-checkbox-desc">HSTS, CSP, TLS cipher suites, cookie flags</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="RESPONSIVE" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Responsive Behavior</span>
+                  <span class="module-checkbox-desc">Horizontal overflow & touch target sizing</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="TECHNICAL_HEALTH" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Technical Health</span>
+                  <span class="module-checkbox-desc">Broken links, console errors, JS exceptions</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="TECHNOLOGY" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Technology Stack</span>
+                  <span class="module-checkbox-desc">Framework, CDN, & web server detection</span>
+                </div>
+              </label>
+
+              <label class="module-checkbox-card selected">
+                <input type="checkbox" name="modules" value="THIRD_PARTY" checked>
+                <div class="module-checkbox-label">
+                  <span class="module-checkbox-title">Third-Party Assets</span>
+                  <span class="module-checkbox-desc">External scripts, trackers, & font impact</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-md">
+            <a href="dashboard.html" class="btn btn-secondary">Cancel</a>
+            <button type="submit" id="start-audit-btn" class="btn btn-primary btn-lg">
+              <span data-icon="zap"></span>
+              <span>Launch Audit Now</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { auth } from "./js/auth.js";
+    import { apiClient } from "./js/api.js";
+    import { validateUrl, showToast } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+      auth.updateNavAuthState();
+
+      // Check prefilled URL from landing hero
+      const prefilled = sessionStorage.getItem("webaudit360_prefill_url");
+      if (prefilled) {
+        document.getElementById("target-url").value = prefilled;
+        sessionStorage.removeItem("webaudit360_prefill_url");
+      }
+
+      // Toggle crawl limits on scan mode change
+      const scanModeSelect = document.getElementById("scan-mode");
+      const crawlLimits = document.getElementById("crawl-limits-section");
+      scanModeSelect.addEventListener("change", (e) => {
+        if (e.target.value === "FULL_SITE") {
+          crawlLimits.style.display = "block";
+        } else {
+          crawlLimits.style.display = "none";
+        }
+      });
+
+      // Handle card checkbox visual toggle
+      const checkboxes = document.querySelectorAll(".module-checkbox-card input[type='checkbox']");
+      checkboxes.forEach((cb) => {
+        cb.addEventListener("change", () => {
+          const card = cb.closest(".module-checkbox-card");
+          if (cb.checked) {
+            card.classList.add("selected");
+          } else {
+            card.classList.remove("selected");
+          }
+        });
+      });
+
+      // Handle Form Submit
+      const form = document.getElementById("audit-config-form");
+      const submitBtn = document.getElementById("start-audit-btn");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const urlInput = document.getElementById("target-url").value.trim();
+        const validation = validateUrl(urlInput);
+
+        if (!validation.valid) {
+          showToast("Validation Error", validation.error, "error");
+          document.getElementById("target-url").focus();
+          return;
+        }
+
+        const scanMode = document.getElementById("scan-mode").value;
+        const deviceProfile = document.getElementById("device-profile").value;
+        const selectedModules = Array.from(document.querySelectorAll("input[name='modules']:checked")).map(cb => cb.value);
+
+        if (selectedModules.length === 0) {
+          showToast("Validation Error", "Please select at least one audit module.", "error");
+          return;
+        }
+
+        submitBtn.classList.add("is-loading");
+
+        const auditPayload = {
+          target_url: validation.url,
+          scan_mode: scanMode,
+          device_profile: deviceProfile,
+          selected_modules: selectedModules,
+          max_pages: parseInt(document.getElementById("max-pages").value || 50, 10),
+          max_depth: parseInt(document.getElementById("max-depth").value || 3, 10),
+          concurrency: parseInt(document.getElementById("concurrency").value || 2, 10)
+        };
+
+        try {
+          const result = await apiClient.post("/audits", auditPayload);
+          showToast("Audit Initiated", `Job #${result.id} is queued. Redirecting to live monitor...`, "success");
+          setTimeout(() => {
+            window.location.href = `live-audit.html?id=${result.id}`;
+          }, 600);
+        } catch (err) {
+          showToast("Failed to Start Audit", err.message || "Server connection error", "error");
+        } finally {
+          submitBtn.classList.remove("is-loading");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Health — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="technical.html" class="slide-nav-item active"><span data-icon="activity"></span> Technical Health</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Engines</div>
+        <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+        <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
+        <a href="technical.html" class="app-sidebar-link active"><span data-icon="activity"></span> Technical Health</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="container">
+        <div style="margin-bottom: var(--space-xl);">
+          <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">ENGINE 06</span>
+          <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">Technical Website Health</h1>
+          <p class="text-muted">Broken internal & external links, redirect loops, browser console errors, unhandled exceptions, and mixed-content</p>
+        </div>
+
+        <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Runtime Errors & Link Status</h2>
+          <div class="empty-state">
+            <div class="empty-state-icon"><span data-icon="activity"></span></div>
+            <h3 class="empty-state-title">No Technical Defects Logged</h3>
+            <p class="empty-state-desc">Technical health evaluations record console errors and broken hyperlinks during live crawler and browser execution.</p>
+            <a href="new-audit.html" class="btn btn-primary"><span data-icon="zap"></span> Run Health Scan</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+    });
+  </script>
+</body>
+</html>

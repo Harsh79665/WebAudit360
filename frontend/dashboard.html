@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle Slide Menu">
+          <span data-icon="menu"></span>
+        </button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle Theme">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+
+        <a href="new-audit.html" class="btn btn-primary btn-sm">
+          <span data-icon="zap"></span>
+          <span>New Audit</span>
+        </a>
+
+        <div id="nav-auth-actions"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Menu Drawer (Mobile & Universal) -->
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu" aria-label="Navigation Menu">
+    <div class="slide-menu-header">
+      <div class="flex items-center gap-xs">
+        <span data-icon="globe" data-icon-class="gradient-text"></span>
+        <strong>WebAudit 360</strong>
+      </div>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <div class="slide-nav-section-title">Workspace</div>
+      <a href="dashboard.html" class="slide-nav-item active"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> Audit History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Continuous Monitoring</a>
+      
+      <div class="slide-nav-divider"></div>
+      <div class="slide-nav-section-title">Engines</div>
+      <a href="performance.html" class="slide-nav-item"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+      <a href="responsive.html" class="slide-nav-item"><span data-icon="smartphone"></span> Responsive</a>
+      <a href="technical.html" class="slide-nav-item"><span data-icon="activity"></span> Technical Health</a>
+      <a href="technology.html" class="slide-nav-item"><span data-icon="cpu"></span> Technology Stack</a>
+      <a href="website-structure.html" class="slide-nav-item"><span data-icon="share2"></span> Structure Explorer</a>
+      <a href="visual-regression.html" class="slide-nav-item"><span data-icon="monitor"></span> Visual Regression</a>
+      <a href="api-health.html" class="slide-nav-item"><span data-icon="code"></span> API Health</a>
+      <a href="dependencies.html" class="slide-nav-item"><span data-icon="layers"></span> Dependencies</a>
+      <a href="domain-health.html" class="slide-nav-item"><span data-icon="globe"></span> Domain & DNS</a>
+      
+      <div class="slide-nav-divider"></div>
+      <a href="settings.html" class="slide-nav-item"><span data-icon="settings"></span> Settings & API Keys</a>
+      <a href="index.html" class="slide-nav-item"><span data-icon="globe"></span> Public Landing Page</a>
+    </nav>
+    <div class="slide-menu-footer">
+      <div class="small-text">WebAudit 360 &bull; Harsh Patel</div>
+    </div>
+  </aside>
+
+  <!-- App Layout -->
+  <div class="app-layout">
+    <!-- Desktop Sidebar -->
+    <aside class="app-sidebar" aria-label="Sidebar Navigation">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link active"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> Audit History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+
+        <div class="app-sidebar-title">Specialized Engines</div>
+        <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+        <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
+        <a href="technical.html" class="app-sidebar-link"><span data-icon="activity"></span> Technical Health</a>
+        <a href="technology.html" class="app-sidebar-link"><span data-icon="cpu"></span> Technology</a>
+        <a href="website-structure.html" class="app-sidebar-link"><span data-icon="share2"></span> Structure</a>
+        <a href="visual-regression.html" class="app-sidebar-link"><span data-icon="monitor"></span> Visual Regression</a>
+        <a href="api-health.html" class="app-sidebar-link"><span data-icon="code"></span> API Health</a>
+        <a href="dependencies.html" class="app-sidebar-link"><span data-icon="layers"></span> Dependencies</a>
+        <a href="domain-health.html" class="app-sidebar-link"><span data-icon="globe"></span> Domain & DNS</a>
+
+        <div class="app-sidebar-title">Configuration</div>
+        <a href="team.html" class="app-sidebar-link"><span data-icon="users"></span> Team</a>
+        <a href="integrations.html" class="app-sidebar-link"><span data-icon="code"></span> Integrations & Webhooks</a>
+        <a href="settings.html" class="app-sidebar-link"><span data-icon="settings"></span> Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <div class="dashboard-header">
+        <div class="dashboard-title-group">
+          <h1>Website Intelligence Dashboard</h1>
+          <p>Real-time audit summaries, active projects, and verified security metrics</p>
+        </div>
+        <div class="flex gap-sm">
+          <button id="refresh-dashboard-btn" class="btn btn-secondary btn-sm">
+            <span data-icon="refreshCw"></span>
+            <span>Refresh Data</span>
+          </button>
+          <a href="new-audit.html" class="btn btn-primary btn-sm">
+            <span data-icon="zap"></span>
+            <span>Run New Audit</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Real Metrics Grid -->
+      <div class="dashboard-metrics-grid">
+        <div class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-title">Active Projects</span>
+            <span data-icon="layers" class="text-muted"></span>
+          </div>
+          <div id="metric-projects-count" class="metric-card-value">0</div>
+          <div class="metric-card-footer">Configured website domains</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-title">Completed Audits</span>
+            <span data-icon="check" class="text-muted"></span>
+          </div>
+          <div id="metric-audits-count" class="metric-card-value">0</div>
+          <div class="metric-card-footer">Verifiable scan runs</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-title">Open Issues</span>
+            <span data-icon="alertTriangle" class="text-muted"></span>
+          </div>
+          <div id="metric-issues-count" class="metric-card-value">0</div>
+          <div class="metric-card-footer">Actionable findings awaiting fix</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-title">Critical Vulnerabilities</span>
+            <span data-icon="shield" class="text-muted"></span>
+          </div>
+          <div id="metric-critical-count" class="metric-card-value" style="color: var(--color-critical);">0</div>
+          <div class="metric-card-footer">Verified security priorities</div>
+        </div>
+      </div>
+
+      <!-- Recent Audits Section -->
+      <div class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2 class="dashboard-section-title">Recent Website Audits</h2>
+          <a href="history.html" class="btn btn-outline btn-sm">View Full History</a>
+        </div>
+
+        <div id="audits-container">
+          <!-- Populated dynamically via API; displays clean empty state if no audits exist -->
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <span data-icon="gauge"></span>
+            </div>
+            <h3 class="empty-state-title">No Audits Performed Yet</h3>
+            <p class="empty-state-desc">
+              Submit your first website URL to measure performance, test accessibility, inspect SEO metadata, and evaluate security headers.
+            </p>
+            <a href="new-audit.html" class="btn btn-primary">
+              <span data-icon="zap"></span>
+              <span>Launch First Audit</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { auth } from "./js/auth.js";
+    import { apiClient } from "./js/api.js";
+    import { getScoreDetails, formatDate, escapeHtml, showToast } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+      auth.updateNavAuthState();
+
+      const refreshBtn = document.getElementById("refresh-dashboard-btn");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", () => loadDashboardData());
+      }
+
+      await loadDashboardData();
+    });
+
+    async function loadDashboardData() {
+      const container = document.getElementById("audits-container");
+      const projEl = document.getElementById("metric-projects-count");
+      const auditEl = document.getElementById("metric-audits-count");
+      const issueEl = document.getElementById("metric-issues-count");
+      const critEl = document.getElementById("metric-critical-count");
+
+      try {
+        // Fetch real audits from backend
+        const auditsData = await apiClient.get("/audits").catch(() => ({ items: [], total: 0 }));
+        const projectsData = await apiClient.get("/projects").catch(() => ({ items: [], total: 0 }));
+        const findingsData = await apiClient.get("/findings?status=OPEN").catch(() => ({ items: [], total: 0 }));
+
+        const audits = auditsData.items || [];
+        const projects = projectsData.items || [];
+        const findings = findingsData.items || [];
+
+        if (projEl) projEl.textContent = projects.length || "0";
+        if (auditEl) auditEl.textContent = audits.length || "0";
+        if (issueEl) issueEl.textContent = findings.length || "0";
+        if (critEl) {
+          const criticalCount = findings.filter(f => f.severity === "CRITICAL").length;
+          critEl.textContent = criticalCount;
+        }
+
+        if (audits.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon"><span data-icon="gauge"></span></div>
+              <h3 class="empty-state-title">No Audits Performed Yet</h3>
+              <p class="empty-state-desc">
+                Submit your first website URL to measure performance, test accessibility, inspect SEO metadata, and evaluate security headers.
+              </p>
+              <a href="new-audit.html" class="btn btn-primary">
+                <span data-icon="zap"></span>
+                <span>Launch First Audit</span>
+              </a>
+            </div>
+          `;
+          renderIcons(container);
+          return;
+        }
+
+        // Render real audit records table
+        let tableHtml = `
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Target Website</th>
+                  <th>Mode & Device</th>
+                  <th>Overall Score</th>
+                  <th>Status</th>
+                  <th>Scanned Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        audits.forEach((audit) => {
+          const scoreObj = getScoreDetails(audit.overall_score);
+          tableHtml += `
+            <tr>
+              <td>
+                <div class="table-target-cell">
+                  <span data-icon="globe"></span>
+                  <a href="audit-report.html?id=${audit.id}" class="table-target-url" title="${escapeHtml(audit.target_url)}">
+                    ${escapeHtml(audit.target_url)}
+                  </a>
+                </div>
+              </td>
+              <td>${escapeHtml(audit.scan_mode)} &bull; ${escapeHtml(audit.device_profile)}</td>
+              <td>
+                <span class="score-pill ${scoreObj.class}">
+                  ${audit.overall_score !== null ? Math.round(audit.overall_score) : 'N/A'} - ${scoreObj.label}
+                </span>
+              </td>
+              <td><span class="badge">${escapeHtml(audit.status)}</span></td>
+              <td>${formatDate(audit.created_at)}</td>
+              <td>
+                <a href="audit-report.html?id=${audit.id}" class="btn btn-secondary btn-sm">View Report</a>
+              </td>
+            </tr>
+          `;
+        });
+
+        tableHtml += `
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        container.innerHTML = tableHtml;
+        renderIcons(container);
+      } catch (err) {
+        console.warn("Backend not yet connected or empty:", err);
+      }
+    }
+  </script>
+</body>
+</html>

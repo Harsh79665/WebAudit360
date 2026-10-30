@@ -1,0 +1,103 @@
+# ==============================================================================
+# WebAudit 360 — Docker Compose Multi-Service Architecture
+# Creator: Harsh Patel
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # 1. API & Web Gateway
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webaudit360_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/webaudit360
+      - SYNC_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/webaudit360
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=webaudit360_docker_local_secret_key_32bytes_min
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - evidence_storage:/app/storage_data
+    networks:
+      - webaudit_network
+
+  # 2. Distributed Audit Worker (Chromium, Lighthouse, axe-core)
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webaudit360_worker
+    restart: unless-stopped
+    command: ["celery", "-A", "backend.app.workers.celery_app.celery_app", "worker", "--loglevel=INFO", "-c", "2"]
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/webaudit360
+      - SYNC_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/webaudit360
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=webaudit360_docker_local_secret_key_32bytes_min
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - evidence_storage:/app/storage_data
+    networks:
+      - webaudit_network
+
+  # 3. PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: webaudit360_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=webaudit360
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d webaudit360"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webaudit_network
+
+  # 4. Redis Queue & Pub/Sub
+  redis:
+    image: redis:7.2-alpine
+    container_name: webaudit360_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webaudit_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  evidence_storage:
+
+networks:
+  webaudit_network:
+    driver: bridge

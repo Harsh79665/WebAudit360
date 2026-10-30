@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <span data-icon="globe" data-icon-class="gradient-text"></span>
+        <span>WebAudit <span class="gradient-text">360</span></span>
+      </a>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding: var(--space-3xl) 0;">
+    <div class="container">
+      <div class="about-card">
+        <div class="section-tag">About WebAudit 360</div>
+        <h1 class="section-title">Evidence-Driven Website Intelligence</h1>
+        
+        <p class="body-text" style="margin-bottom: var(--space-md);">
+          WebAudit 360 was created and architected by <strong>Harsh Patel</strong> as a production-oriented website intelligence and continuous monitoring platform.
+        </p>
+        <p class="body-text" style="margin-bottom: var(--space-md);">
+          The platform was conceived to solve a widespread flaw in web analysis tooling: the proliferation of superficial URL checkers, mock dashboards, and synthetic scores that provide neither verifiable engineering evidence nor reliable remediation guidance.
+        </p>
+        <p class="body-text" style="margin-bottom: var(--space-md);">
+          WebAudit 360 operates under a strict <strong>No-Fake-Data Policy</strong>. Every score, metric, and finding originates from a real measurement, an actual headless browser session (Playwright + Chromium), an automated accessibility rule (axe-core), an RFC-compliant network handshake, or an authorized vulnerability assessment (OWASP ZAP).
+        </p>
+        
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: var(--space-xl); margin-bottom: var(--space-sm);">Core Architecture Principles</h2>
+        <ul style="list-style: disc; margin-left: var(--space-lg); color: var(--text-secondary); line-height: 1.8;">
+          <li><strong>Verifiable Evidence:</strong> Every detected finding links directly to an affected URL, CSS selector, HTTP status code, or response header snippet.</li>
+          <li><strong>Zero Fabrication:</strong> Missing or unsupported modules are transparently marked as N/A, never as zero or an artificial pass.</li>
+          <li><strong>Defensive Engineering:</strong> Outbound requests are protected by multi-layer SSRF defenses, IP pinning, and DNS rebinding mitigations.</li>
+          <li><strong>Developer Actionability:</strong> Findings include concrete remediation code snippets and retest workflows to verify resolution.</li>
+        </ul>
+
+        <div class="creator-highlight">
+          <div class="creator-avatar">HP</div>
+          <div>
+            <div style="font-weight: 700; font-size: 1.125rem;">Harsh Patel</div>
+            <div class="small-text text-muted">Creator & Lead Architect, WebAudit 360</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container text-center">
+      &copy; <span id="footer-year">2026</span> WebAudit 360. All Rights Reserved. Made by Harsh Patel.
+    </div>
+  </footer>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initFooterYear } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initFooterYear();
+    });
+  </script>
+</body>
+</html>

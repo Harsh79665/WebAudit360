@@ -1,0 +1,39 @@
+/* WebAudit 360 — Spatial Theme Overrides & Subtle Depth */
+
+/* Default Classic White Theme refinement */
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Spatial Glass Elevation for Dark Mode */
+[data-theme="dark"] .glass-panel {
+  background: rgba(19, 29, 53, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .metric-card {
+  background: rgba(19, 29, 53, 0.6);
+  border: 1px solid rgba(30, 46, 79, 0.8);
+}
+
+[data-theme="dark"] .metric-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.8), 0 0 12px rgba(56, 189, 248, 0.1);
+}
+
+[data-theme="dark"] .capability-card {
+  background: rgba(19, 29, 53, 0.6);
+  border: 1px solid rgba(30, 46, 79, 0.8);
+}
+
+[data-theme="dark"] .capability-card:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.15);
+}

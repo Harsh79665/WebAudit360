@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit & Competitor Comparison — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="comparison.html" class="slide-nav-item active"><span data-icon="layers"></span> Comparison</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> History</a>
+        <a href="comparison.html" class="app-sidebar-link active"><span data-icon="layers"></span> Comparison</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="container">
+        <div style="margin-bottom: var(--space-xl);">
+          <h1 style="font-size: 1.75rem; font-weight: 800;">Audit & Competitor Comparison</h1>
+          <p class="text-muted">Compare two audits side-by-side using standardized passive measurements</p>
+        </div>
+
+        <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <div class="grid grid-cols-2 gap-lg" style="margin-bottom: var(--space-lg);">
+            <div class="form-group">
+              <label for="audit-a-select" class="form-label">Audit A (Baseline / Your Site)</label>
+              <select id="audit-a-select" class="form-select">
+                <option value="">Select an audit...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="audit-b-select" class="form-label">Audit B (Candidate / Competitor)</label>
+              <select id="audit-b-select" class="form-select">
+                <option value="">Select an audit...</option>
+              </select>
+            </div>
+          </div>
+          <button id="run-compare-btn" class="btn btn-primary btn-sm">
+            <span data-icon="layers"></span> Compare Audits
+          </button>
+        </div>
+
+        <div id="comparison-result-panel" class="glass-panel" style="padding: var(--space-xl); display: none;">
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Side-by-Side Intelligence Breakdown</h2>
+          <div id="comparison-table-content"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { apiClient } from "./js/api.js";
+    import { showToast } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+
+      try {
+        const data = await apiClient.get("/audits").catch(() => ({ items: [] }));
+        const audits = data.items || [];
+        const selA = document.getElementById("audit-a-select");
+        const selB = document.getElementById("audit-b-select");
+
+        audits.forEach((a) => {
+          const optA = document.createElement("option");
+          optA.value = a.id;
+          optA.textContent = `#${a.id} - ${a.target_url} (${Math.round(a.overall_score || 0)})`;
+          selA.appendChild(optA);
+
+          const optB = document.createElement("option");
+          optB.value = a.id;
+          optB.textContent = `#${a.id} - ${a.target_url} (${Math.round(a.overall_score || 0)})`;
+          selB.appendChild(optB);
+        });
+
+        document.getElementById("run-compare-btn").addEventListener("click", async () => {
+          const idA = selA.value;
+          const idB = selB.value;
+          if (!idA || !idB) {
+            showToast("Selection Needed", "Please select both audits to compare.", "error");
+            return;
+          }
+          if (idA === idB) {
+            showToast("Invalid Comparison", "Please select two distinct audits.", "error");
+            return;
+          }
+
+          const auditA = await apiClient.get(`/audits/${idA}`);
+          const auditB = await apiClient.get(`/audits/${idB}`);
+
+          const panel = document.getElementById("comparison-result-panel");
+          const content = document.getElementById("comparison-table-content");
+          panel.style.display = "block";
+
+          content.innerHTML = `
+            <div class="data-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Category Metric</th>
+                    <th>Audit A: ${auditA.target_url}</th>
+                    <th>Audit B: ${auditB.target_url}</th>
+                    <th>Delta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Overall Score</strong></td>
+                    <td>${Math.round(auditA.overall_score || 0)}</td>
+                    <td>${Math.round(auditB.overall_score || 0)}</td>
+                    <td>${(auditB.overall_score - auditA.overall_score) > 0 ? '+' : ''}${Math.round((auditB.overall_score - auditA.overall_score) || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td>Performance</td>
+                    <td>${auditA.score_performance ?? 'N/A'}</td>
+                    <td>${auditB.score_performance ?? 'N/A'}</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td>SEO</td>
+                    <td>${auditA.score_seo ?? 'N/A'}</td>
+                    <td>${auditB.score_seo ?? 'N/A'}</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td>Accessibility</td>
+                    <td>${auditA.score_accessibility ?? 'N/A'}</td>
+                    <td>${auditB.score_accessibility ?? 'N/A'}</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td>Security</td>
+                    <td>${auditA.score_security ?? 'N/A'}</td>
+                    <td>${auditB.score_security ?? 'N/A'}</td>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          `;
+        });
+      } catch (e) {}
+    });
+  </script>
+</body>
+</html>

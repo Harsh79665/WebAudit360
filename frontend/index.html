@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebAudit 360 — Website Intelligence & Multi-Layer Audit Platform</title>
+  <meta name="description" content="Understand every layer of your website. Measure performance, uncover technical issues, analyze accessibility, and evaluate web security with evidence-driven intelligence.">
+  
+  <!-- Inline theme initializer to eliminate flash of unstyled theme (FOIT) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <div class="flex items-center gap-md">
+        <!-- Animated Slide Menu Toggle -->
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Open Navigation Menu" title="Menu">
+          <span data-icon="menu"></span>
+        </button>
+
+        <a href="index.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+          <span class="brand-badge">Intelligence</span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#capabilities" class="nav-link">Capabilities</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <!-- Navigation Actions: Theme Toggle & Auth -->
+      <div class="nav-actions">
+        <!-- Capsule-style Theme Toggle -->
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle Light and Dark Mode" title="Toggle Theme">
+          <div class="theme-toggle-option active" data-theme-val="light" aria-label="Light Theme">
+            <span data-icon="sun"></span>
+          </div>
+          <div class="theme-toggle-option" data-theme-val="dark" aria-label="Dark Theme">
+            <span data-icon="moon"></span>
+          </div>
+        </div>
+
+        <div id="nav-auth-actions" class="flex items-center gap-xs">
+          <a href="login.html" class="btn btn-secondary btn-sm btn-login">Sign In</a>
+          <a href="new-audit.html" class="btn btn-primary btn-sm">Start Audit</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Navigation Menu (Drawer) with Backdrop -->
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu" aria-label="Slide Menu" aria-hidden="true">
+    <div class="slide-menu-header">
+      <div class="flex items-center gap-xs">
+        <span data-icon="globe" data-icon-class="gradient-text"></span>
+        <strong>WebAudit 360</strong>
+      </div>
+      <button id="slide-menu-close" class="slide-menu-close-btn" aria-label="Close Navigation Menu">
+        <span data-icon="x"></span>
+      </button>
+    </div>
+
+    <nav class="slide-menu-nav">
+      <div class="slide-nav-section-title">Public Platform</div>
+      <a href="index.html" class="slide-nav-item active">
+        <span data-icon="globe"></span> Home
+      </a>
+      <a href="#capabilities" class="slide-nav-item">
+        <span data-icon="layers"></span> Capabilities
+      </a>
+      <a href="#how-it-works" class="slide-nav-item">
+        <span data-icon="activity"></span> How It Works
+      </a>
+      <a href="about.html" class="slide-nav-item">
+        <span data-icon="users"></span> About Us
+      </a>
+      <a href="faq.html" class="slide-nav-item">
+        <span data-icon="alertCircle"></span> FAQ
+      </a>
+      <a href="contact.html" class="slide-nav-item">
+        <span data-icon="fileText"></span> Contact
+      </a>
+
+      <div class="slide-nav-divider"></div>
+
+      <div class="slide-nav-section-title">Audit Workspace</div>
+      <a href="dashboard.html" class="slide-nav-item">
+        <span data-icon="gauge"></span> Dashboard
+      </a>
+      <a href="new-audit.html" class="slide-nav-item">
+        <span data-icon="zap"></span> New Audit
+      </a>
+      <a href="projects.html" class="slide-nav-item">
+        <span data-icon="layers"></span> Projects
+      </a>
+      <a href="findings.html" class="slide-nav-item">
+        <span data-icon="alertTriangle"></span> Issue Manager
+      </a>
+      <a href="history.html" class="slide-nav-item">
+        <span data-icon="clock"></span> Audit History
+      </a>
+      <a href="monitoring.html" class="slide-nav-item">
+        <span data-icon="activity"></span> Continuous Monitoring
+      </a>
+      <a href="settings.html" class="slide-nav-item">
+        <span data-icon="settings"></span> Settings & API Keys
+      </a>
+    </nav>
+
+    <div class="slide-menu-footer">
+      <div class="small-text">WebAudit 360 v1.0.0</div>
+      <div class="small-text text-muted">Created by Harsh Patel</div>
+    </div>
+  </aside>
+
+  <!-- Main Hero Section -->
+  <main>
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-badge">
+          <span data-icon="shield"></span>
+          <span>Next-Generation Website Intelligence Ecosystem</span>
+        </div>
+
+        <h1 class="hero-title">
+          Understand Every Layer of <span class="gradient-text">Your Website</span>.
+        </h1>
+
+        <p class="hero-subtitle">
+          Measure performance, uncover technical issues, analyze accessibility and evaluate website security with evidence-driven website intelligence.
+        </p>
+
+        <!-- Live URL Audit Starter Capsule -->
+        <form id="hero-audit-form" class="hero-form-container">
+          <div class="url-input-capsule-wrapper">
+            <div class="url-input-icon">
+              <span data-icon="globe"></span>
+            </div>
+            <input 
+              type="text" 
+              id="hero-url-input" 
+              class="url-input-capsule" 
+              placeholder="https://example.com" 
+              aria-label="Website URL to audit" 
+              required
+            >
+            <button type="submit" id="hero-submit-btn" class="btn btn-primary">
+              <span data-icon="zap"></span>
+              <span>Start Audit</span>
+            </button>
+          </div>
+          <div class="hero-form-hint">
+            Supports single-page & full-site audits with mobile & desktop emulation. Real measurements only.
+          </div>
+        </form>
+
+        <!-- Hero Metadata Badges -->
+        <div class="hero-meta-badges">
+          <div class="meta-badge-item">
+            <span data-icon="check"></span>
+            <span>Real Core Web Vitals (Lighthouse 13.x)</span>
+          </div>
+          <div class="meta-badge-item">
+            <span data-icon="check"></span>
+            <span>WCAG 2.1/2.2 AA (axe-core)</span>
+          </div>
+          <div class="meta-badge-item">
+            <span data-icon="check"></span>
+            <span>Passive & Authorized Active Security</span>
+          </div>
+          <div class="meta-badge-item">
+            <span data-icon="check"></span>
+            <span>Traceable Evidence & Code Fixes</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Multi-Layer Capabilities Grid -->
+    <section id="capabilities" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Audit Subsystems</div>
+          <h2 class="section-title">Deep Technical Inspection Across 11 Engines</h2>
+          <p class="section-subtitle">
+            Every score originates from genuine measurements, verifiable browser sessions, and RFC standard evaluations.
+          </p>
+        </div>
+
+        <div class="capabilities-grid">
+          <!-- Performance -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="gauge"></span></div>
+            <h3 class="capability-title">Performance Intelligence</h3>
+            <p class="capability-desc">
+              Measures First Contentful Paint, Largest Contentful Paint, Cumulative Layout Shift, Total Blocking Time, and Speed Index using real Lighthouse CLI runs with repeated-run median calculations.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">LCP & CLS</span>
+              <span class="capability-tag">DOM Size</span>
+              <span class="capability-tag">Render-Blocking Assets</span>
+            </div>
+          </article>
+
+          <!-- Accessibility -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="accessibility"></span></div>
+            <h3 class="capability-title">Accessibility (a11y)</h3>
+            <p class="capability-desc">
+              Executes axe-core inside genuine Playwright Chromium sessions to evaluate WCAG 2.1/2.2 AA rules, color contrast, keyboard focus, ARIA attributes, and accessible labels with exact element selectors.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">WCAG 2.1 / 2.2 AA</span>
+              <span class="capability-tag">axe-core</span>
+              <span class="capability-tag">Element Selectors</span>
+            </div>
+          </article>
+
+          <!-- SEO -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="search"></span></div>
+            <h3 class="capability-title">SEO Intelligence</h3>
+            <p class="capability-desc">
+              Evaluates title tags, meta descriptions, heading structures, canonical URLs, robots.txt, sitemap.xml, X-Robots-Tag directives, Open Graph cards, and structured microdata.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">Meta Directives</span>
+              <span class="capability-tag">Heading Tree</span>
+              <span class="capability-tag">Canonical Validation</span>
+            </div>
+          </article>
+
+          <!-- Security -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="shield"></span></div>
+            <h3 class="capability-title">Passive & Active Security</h3>
+            <p class="capability-desc">
+              Passive inspection of HSTS, CSP, X-Frame-Options, TLS cipher suites, and cookie security flags. Authorized active vulnerability testing via OWASP ZAP following cryptographic domain verification.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">HSTS & CSP</span>
+              <span class="capability-tag">TLS Chain</span>
+              <span class="capability-tag">OWASP WSTG</span>
+            </div>
+          </article>
+
+          <!-- Responsive -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="smartphone"></span></div>
+            <h3 class="capability-title">Responsive Behavior</h3>
+            <p class="capability-desc">
+              Tests layouts across mobile (390×844), tablet (768×1024), and desktop (1440×900) viewports to detect horizontal scrollbars, clipped elements, overlapping layers, and touch target sizing.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">Viewport Emulation</span>
+              <span class="capability-tag">Overflow Detection</span>
+              <span class="capability-tag">Touch Targets</span>
+            </div>
+          </article>
+
+          <!-- Technical Health -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="activity"></span></div>
+            <h3 class="capability-title">Technical Website Health</h3>
+            <p class="capability-desc">
+              Tracks broken internal/external links, redirect chains and loops, browser console errors, unhandled JavaScript exceptions, failed assets, and mixed-content violations.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">Broken Links</span>
+              <span class="capability-tag">Console Errors</span>
+              <span class="capability-tag">Mixed Content</span>
+            </div>
+          </article>
+
+          <!-- Technology Detection -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="cpu"></span></div>
+            <h3 class="capability-title">Technology Stack Fingerprinting</h3>
+            <p class="capability-desc">
+              Identifies observable frameworks (React, Next.js, Vue, Django, WordPress), CDNs (Cloudflare), web servers, and third-party libraries using evidence-based DOM, script, and HTTP signatures.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">Frameworks</span>
+              <span class="capability-tag">CDN & Infrastructure</span>
+              <span class="capability-tag">Confidence Scores</span>
+            </div>
+          </article>
+
+          <!-- Visual Regression -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="monitor"></span></div>
+            <h3 class="capability-title">Visual Regression Testing</h3>
+            <p class="capability-desc">
+              Captures high-fidelity screenshots under standardized browser conditions and performs perceptual image diffing against baseline snapshots to detect layout shifts and UI regressions.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">Pixel Diffing</span>
+              <span class="capability-tag">Baseline Management</span>
+              <span class="capability-tag">Layout Shifts</span>
+            </div>
+          </article>
+
+          <!-- Third-Party Dependencies -->
+          <article class="capability-card">
+            <div class="capability-icon"><span data-icon="code"></span></div>
+            <h3 class="capability-title">Third-Party Asset Inventory</h3>
+            <p class="capability-desc">
+              Catalogs external scripts, fonts, analytics, tag managers, and ad trackers, measuring their transfer sizes, load timing overhead, and potential supply-chain impacts.
+            </p>
+            <div class="capability-tags">
+              <span class="capability-tag">External Scripts</span>
+              <span class="capability-tag">Load Impact</span>
+              <span class="capability-tag">Host Attribution</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section" style="background-color: var(--bg-secondary);">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Process Architecture</div>
+          <h2 class="section-title">Transparent, Traceable Workflow</h2>
+          <p class="section-subtitle">
+            From single-page checks to full recursive crawls, every stage is verifiable.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <h3 class="step-title">Configure Scope</h3>
+            <p class="step-desc">
+              Select single-page or full-site crawl, mobile/desktop device profiles, audit modules, and custom concurrency boundaries.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <h3 class="step-title">Distributed Scan</h3>
+            <p class="step-desc">
+              Celery workers execute Chromium, Lighthouse, and network crawlers in isolated environments, streaming real-time progress via WebSocket.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <h3 class="step-title">Evidence & Scoring</h3>
+            <p class="step-desc">
+              Raw measurements are normalized into transparent category scores (0–100) with line-level code snippets, selectors, and evidence.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">04</div>
+            <h3 class="step-title">Retest & Monitor</h3>
+            <p class="step-desc">
+              Track findings from Open to Fixed, trigger individual rule retests to verify corrections, and schedule automated recurring scans.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+      <div class="container">
+        <div class="about-card">
+          <div class="section-tag">About WebAudit 360</div>
+          <h2 class="section-title">Engineering-First Website Intelligence</h2>
+          <p class="body-text" style="margin-bottom: var(--space-md);">
+            WebAudit 360 was designed and developed by <strong>Harsh Patel</strong> as a genuinely functional, production-oriented website intelligence and continuous monitoring ecosystem.
+          </p>
+          <p class="body-text" style="margin-bottom: var(--space-md);">
+            Unlike basic URL checkers, static dashboards, or mockups that populate interfaces with fabricated numbers, WebAudit 360 adheres to a strict <em>No-Fake-Data Policy</em>. Every metric displayed originates from an actual browser measurement, an automated accessibility evaluation, an RFC-compliant protocol verification, or an authorized security test.
+          </p>
+          <p class="body-text">
+            The platform bridges the gap between high-level website health overviews and granular engineering evidence, providing actionable remediation code snippets, retest workflows, and continuous regression detection for individual developers and engineering teams.
+          </p>
+
+          <div class="creator-highlight">
+            <div class="creator-avatar">HP</div>
+            <div>
+              <div style="font-weight: 700; font-size: 1.125rem;">Harsh Patel</div>
+              <div class="small-text text-muted">Architect & Full-Stack Developer of WebAudit 360</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section" style="background-color: var(--bg-secondary);">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Questions & Answers</div>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-subtitle">Clear explanations of our methodology, scoring, and limitations.</p>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>What is the difference between single-page and full-website audits?</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="faq-answer">
+              A single-page audit measures only the exact submitted URL and its directly referenced assets. A full-website audit begins at the homepage or seed URL, parses robots.txt and sitemap.xml, and crawls internal links up to configurable page and depth limits within the authorized domain.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>How are overall scores calculated?</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="faq-answer">
+              When all categories are measured, the overall score is computed as: Overall = (0.25 × Performance) + (0.20 × SEO) + (0.20 × Accessibility) + (0.25 × Security) + (0.10 × Best Practices). If specific modules are omitted, weights are dynamically normalized only across the measured categories, and excluded modules are explicitly labeled as N/A.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>Can automated accessibility testing guarantee 100% WCAG conformance?</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="faq-answer">
+              No. Automated tools such as axe-core test approximately 30% to 40% of WCAG success criteria (contrast, ARIA syntax, form labels). Criteria requiring human judgment, cognitive reading comprehension, or manual screen reader flow are marked as "Manual Review Required" rather than passed.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>Why is domain ownership verification required for active security scans?</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="faq-answer">
+              Passive security analysis (headers, SSL certificate details) is non-invasive and safe for any public page. Active security testing uses OWASP ZAP to inspect input validation and response configurations. To prevent unauthorized testing of third-party websites, active testing is unlocked only after the domain owner completes a cryptographic DNS TXT or HTTP file challenge.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>How does WebAudit 360 prevent Server-Side Request Forgery (SSRF)?</span>
+              <span data-icon="chevronDown"></span>
+            </button>
+            <div class="faq-answer">
+              Every submitted URL, discovered crawl link, and redirect target is parsed and resolved to its underlying IP addresses. Requests to private networks (RFC 1918), loopback interfaces (127.0.0.1, ::1), link-local addresses, and cloud provider metadata endpoints (169.254.169.254) are rejected immediately. Custom transports pin the socket connection directly to validated IPs to prevent DNS rebinding attacks.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Get in Touch</div>
+          <h2 class="section-title">Contact & Support</h2>
+          <p class="section-subtitle">Have questions or feedback? Send a direct message to Harsh Patel.</p>
+        </div>
+
+        <div class="contact-container">
+          <form id="contact-form">
+            <div class="form-group">
+              <label for="contact-name" class="form-label">Full Name</label>
+              <input type="text" id="contact-name" class="form-input" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+              <label for="contact-email" class="form-label">Email Address</label>
+              <input type="email" id="contact-email" class="form-input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="contact-subject" class="form-label">Subject</label>
+              <input type="text" id="contact-subject" class="form-input" placeholder="Inquiry regarding WebAudit 360" required>
+            </div>
+            <div class="form-group">
+              <label for="contact-message" class="form-label">Message</label>
+              <textarea id="contact-message" class="form-textarea" rows="4" placeholder="How can we help you?" required></textarea>
+            </div>
+            <button type="submit" id="contact-submit-btn" class="btn btn-primary w-full">
+              <span data-icon="fileText"></span>
+              <span>Send Message</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="flex items-center gap-xs">
+            <span data-icon="globe" data-icon-class="gradient-text"></span>
+            <strong>WebAudit 360</strong>
+          </div>
+          <p class="footer-brand-desc">
+            Evidence-driven multi-layer website intelligence, performance profiling, accessibility auditing, and continuous monitoring.
+          </p>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Platform</div>
+          <div class="footer-links">
+            <a href="dashboard.html" class="footer-link">Dashboard</a>
+            <a href="new-audit.html" class="footer-link">New Audit</a>
+            <a href="projects.html" class="footer-link">Projects</a>
+            <a href="monitoring.html" class="footer-link">Monitoring</a>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Audit Engines</div>
+          <div class="footer-links">
+            <a href="performance.html" class="footer-link">Performance</a>
+            <a href="seo.html" class="footer-link">SEO</a>
+            <a href="accessibility.html" class="footer-link">Accessibility</a>
+            <a href="security.html" class="footer-link">Security</a>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Information</div>
+          <div class="footer-links">
+            <a href="about.html" class="footer-link">About Us</a>
+            <a href="faq.html" class="footer-link">FAQ</a>
+            <a href="contact.html" class="footer-link">Contact</a>
+            <a href="settings.html" class="footer-link">Settings</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; <span id="footer-year">2026</span> WebAudit 360. All Rights Reserved. Made by Harsh Patel.
+        </div>
+        <div class="flex gap-md">
+          <span class="small-text text-muted">Python FastAPI &bull; Playwright &bull; Lighthouse 13 &bull; axe-core</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { auth } from "./js/auth.js";
+    import { validateUrl, showToast, initFooterYear } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+      initFooterYear();
+      auth.updateNavAuthState();
+
+      // Setup Hero Audit Form submission
+      const heroForm = document.getElementById("hero-audit-form");
+      const heroInput = document.getElementById("hero-url-input");
+      if (heroForm && heroInput) {
+        heroForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const targetUrl = heroInput.value.trim();
+          const validation = validateUrl(targetUrl);
+          if (!validation.valid) {
+            showToast("Invalid Target", validation.error, "error");
+            heroInput.focus();
+            return;
+          }
+
+          // Store preselected target in sessionStorage and redirect to new audit
+          sessionStorage.setItem("webaudit360_prefill_url", validation.url);
+          window.location.href = "new-audit.html";
+        });
+      }
+
+      // Setup FAQ Accordion
+      const faqItems = document.querySelectorAll(".faq-item");
+      faqItems.forEach((item) => {
+        const btn = item.querySelector(".faq-question");
+        if (btn) {
+          btn.addEventListener("click", () => {
+            const isActive = item.classList.contains("active");
+            faqItems.forEach((i) => i.classList.remove("active"));
+            if (!isActive) item.classList.add("active");
+          });
+        }
+      });
+
+      // Setup Contact Form
+      const contactForm = document.getElementById("contact-form");
+      if (contactForm) {
+        contactForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          showToast("Message Sent", "Thank you for contacting Harsh Patel. We will get back to you soon.", "success");
+          contactForm.reset();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

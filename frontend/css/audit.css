@@ -1,0 +1,191 @@
+/* WebAudit 360 — Audit Setup & Live Audit Progress */
+
+/* Audit Setup Page */
+.audit-setup-container {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.audit-setup-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.module-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.module-checkbox-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background-color: var(--bg-surface);
+}
+
+.module-checkbox-card:hover {
+  border-color: var(--accent-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.module-checkbox-card.selected {
+  border-color: var(--accent-primary);
+  background-color: var(--accent-glow);
+}
+
+.module-checkbox-card input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--accent-primary);
+}
+
+.module-checkbox-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.module-checkbox-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.module-checkbox-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Live Audit Progress View */
+.live-audit-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.live-audit-header-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.live-progress-bar-wrapper {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-capsule);
+  overflow: hidden;
+  margin: var(--space-md) 0;
+}
+
+.live-progress-bar {
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-capsule);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+.live-status-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.live-stages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.stage-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  transition: all var(--transition-fast);
+}
+
+.stage-card.running {
+  border-color: var(--accent-primary);
+  background-color: var(--accent-glow);
+}
+
+.stage-card.completed {
+  border-color: var(--color-excellent);
+  background-color: var(--badge-excellent-bg);
+}
+
+.stage-card.failed {
+  border-color: var(--color-critical);
+  background-color: var(--badge-critical-bg);
+}
+
+.stage-card.skipped {
+  opacity: 0.6;
+}
+
+.stage-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-info {
+  flex: 1;
+}
+
+.stage-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stage-status {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Live Event Stream / Log Box */
+.live-log-box {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.8125rem;
+  max-height: 240px;
+  overflow-y: auto;
+  color: var(--text-secondary);
+}
+
+.live-log-entry {
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.live-log-time {
+  color: var(--text-muted);
+}

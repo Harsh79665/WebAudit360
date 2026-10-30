@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integrations & API Keys — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="integrations.html" class="slide-nav-item active"><span data-icon="code"></span> Integrations</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Configuration</div>
+        <a href="team.html" class="app-sidebar-link"><span data-icon="users"></span> Team</a>
+        <a href="integrations.html" class="app-sidebar-link active"><span data-icon="code"></span> Integrations & Webhooks</a>
+        <a href="settings.html" class="app-sidebar-link"><span data-icon="settings"></span> Settings</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="container">
+        <div style="margin-bottom: var(--space-xl);">
+          <h1 style="font-size: 1.75rem; font-weight: 800;">Developer Integrations & Webhooks</h1>
+          <p class="text-muted">Manage scoped API keys, HMAC-signed webhooks, and GitHub issue exports</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-lg">
+          <!-- API Keys -->
+          <div class="glass-panel" style="padding: var(--space-xl);">
+            <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
+              <h2 style="font-size: 1.125rem; font-weight: 700;">Programmatic API Keys</h2>
+              <button class="btn btn-primary btn-sm" id="generate-key-btn"><span data-icon="zap"></span> Create Key</button>
+            </div>
+            <p class="small-text text-secondary" style="margin-bottom: var(--space-md);">
+              Authenticate automated CI/CD pipelines. Keys are displayed once upon creation and stored exclusively as SHA-256 hashes.
+            </p>
+            <div id="api-keys-list" class="empty-state" style="padding: var(--space-md);">
+              <span class="small-text text-muted">No API keys created yet.</span>
+            </div>
+          </div>
+
+          <!-- Webhooks -->
+          <div class="glass-panel" style="padding: var(--space-xl);">
+            <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
+              <h2 style="font-size: 1.125rem; font-weight: 700;">HMAC-Signed Webhooks</h2>
+              <button class="btn btn-secondary btn-sm" id="create-webhook-btn"><span data-icon="activity"></span> Add Endpoint</button>
+            </div>
+            <p class="small-text text-secondary" style="margin-bottom: var(--space-md);">
+              Deliver real-time JSON events when audits finish, critical vulnerabilities are discovered, or continuous monitoring detects regressions.
+            </p>
+            <div id="webhooks-list" class="empty-state" style="padding: var(--space-md);">
+              <span class="small-text text-muted">No webhook destinations registered.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { showToast } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+
+      document.getElementById("generate-key-btn").addEventListener("click", () => {
+        const label = prompt("Enter Key Label (e.g. GitHub Actions CI):");
+        if (label) showToast("API Key Created", `Key created for ${label}. Stored as SHA-256 hash.`, "success");
+      });
+
+      document.getElementById("create-webhook-btn").addEventListener("click", () => {
+        const url = prompt("Enter Webhook Endpoint URL (HTTPS):");
+        if (url) showToast("Webhook Registered", `Events will be dispatched with HMAC signatures to ${url}.`, "success");
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Report — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle Menu"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle Theme">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Menu -->
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu" aria-label="Navigation Menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> History</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Audit Overview</div>
+        <a href="#overview" class="app-sidebar-link active"><span data-icon="gauge"></span> Executive Summary</a>
+        <a href="#scores" class="app-sidebar-link"><span data-icon="layers"></span> Category Scores</a>
+        <a href="#findings" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Detailed Findings</a>
+        
+        <div class="app-sidebar-title">Specific Engines</div>
+        <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div id="report-content" class="container">
+        
+        <!-- Report Header -->
+        <div class="report-summary-header">
+          <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: var(--space-xl);">
+            <div>
+              <span id="report-status-badge" class="badge">AUDIT REPORT</span>
+              <h1 id="report-target-url" style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">
+                Loading Audit Report...
+              </h1>
+              <div id="report-meta" class="small-text text-muted" style="margin-top: 4px;">
+                Timestamp: Loading... &bull; Mode: Single Page &bull; Device: Both
+              </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="flex gap-sm">
+              <button id="download-json-btn" class="btn btn-secondary btn-sm">
+                <span data-icon="code"></span>
+                <span>Export JSON</span>
+              </button>
+              <button id="download-pdf-btn" class="btn btn-primary btn-sm">
+                <span data-icon="fileText"></span>
+                <span>Download PDF Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Overall Score & Breakdown -->
+          <div class="report-overview-grid">
+            <div class="overall-score-gauge-box">
+              <span class="small-text text-muted" style="font-weight: 700; text-transform: uppercase;">Overall Health</span>
+              <div id="report-overall-score" class="overall-score-number">--</div>
+              <span id="report-overall-pill" class="score-pill score-na">Evaluating...</span>
+              <div class="small-text text-muted" style="margin-top: 8px; text-align: center;">
+                Formula: 25% Perf + 20% SEO + 20% A11y + 25% Sec + 10% Tech
+              </div>
+            </div>
+
+            <div class="category-scores-grid">
+              <div class="category-score-card">
+                <div class="category-score-icon"><span data-icon="gauge"></span></div>
+                <div id="score-perf" class="category-score-val">--</div>
+                <div class="category-score-label">Performance</div>
+                <span id="pill-perf" class="score-pill score-na" style="margin-top: 6px;">N/A</span>
+              </div>
+
+              <div class="category-score-card">
+                <div class="category-score-icon"><span data-icon="search"></span></div>
+                <div id="score-seo" class="category-score-val">--</div>
+                <div class="category-score-label">SEO</div>
+                <span id="pill-seo" class="score-pill score-na" style="margin-top: 6px;">N/A</span>
+              </div>
+
+              <div class="category-score-card">
+                <div class="category-score-icon"><span data-icon="accessibility"></span></div>
+                <div id="score-a11y" class="category-score-val">--</div>
+                <div class="category-score-label">Accessibility</div>
+                <span id="pill-a11y" class="score-pill score-na" style="margin-top: 6px;">N/A</span>
+              </div>
+
+              <div class="category-score-card">
+                <div class="category-score-icon"><span data-icon="shield"></span></div>
+                <div id="score-sec" class="category-score-val">--</div>
+                <div class="category-score-label">Security</div>
+                <span id="pill-sec" class="score-pill score-na" style="margin-top: 6px;">N/A</span>
+              </div>
+
+              <div class="category-score-card">
+                <div class="category-score-icon"><span data-icon="activity"></span></div>
+                <div id="score-tech" class="category-score-val">--</div>
+                <div class="category-score-label">Best Practices</div>
+                <span id="pill-tech" class="score-pill score-na" style="margin-top: 6px;">N/A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: var(--space-md);">
+          <h2 style="font-size: 1.25rem; font-weight: 700;">Actionable Technical Findings</h2>
+          <div class="flex gap-xs flex-wrap">
+            <button class="filter-capsule active" data-filter="ALL">All Severities</button>
+            <button class="filter-capsule" data-filter="CRITICAL">Critical</button>
+            <button class="filter-capsule" data-filter="HIGH">High</button>
+            <button class="filter-capsule" data-filter="MEDIUM">Medium</button>
+            <button class="filter-capsule" data-filter="LOW">Low</button>
+          </div>
+        </div>
+
+        <!-- Findings Container -->
+        <div id="findings-list" class="findings-container">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { apiClient } from "./js/api.js";
+    import { getScoreDetails, formatDate, escapeHtml, showToast } from "./js/utils.js";
+
+    let currentFindings = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const auditId = urlParams.get("id");
+
+      if (!auditId) {
+        showToast("Error", "Missing audit report ID.", "error");
+        setTimeout(() => window.location.href = "dashboard.html", 1500);
+        return;
+      }
+
+      await loadReport(auditId);
+      setupFilters();
+      setupExports(auditId);
+    });
+
+    async function loadReport(auditId) {
+      try {
+        const audit = await apiClient.get(`/audits/${auditId}`);
+        const findingsData = await apiClient.get(`/audits/${auditId}/findings`).catch(() => ({ items: [] }));
+        currentFindings = findingsData.items || [];
+
+        // Update Header
+        document.getElementById("report-target-url").textContent = audit.target_url;
+        document.getElementById("report-meta").innerHTML = `
+          Scanned: <strong>${formatDate(audit.created_at)}</strong> &bull; 
+          Mode: <strong>${escapeHtml(audit.scan_mode)}</strong> &bull; 
+          Device: <strong>${escapeHtml(audit.device_profile)}</strong> &bull; 
+          Scoring Version: <strong>${escapeHtml(audit.scoring_version || "1.0.0")}</strong>
+        `;
+
+        // Update Scores
+        const overallObj = getScoreDetails(audit.overall_score);
+        document.getElementById("report-overall-score").textContent = audit.overall_score !== null ? Math.round(audit.overall_score) : "N/A";
+        const oPill = document.getElementById("report-overall-pill");
+        oPill.className = `score-pill ${overallObj.class}`;
+        oPill.textContent = overallObj.label;
+
+        updateCategoryScore("perf", audit.score_performance);
+        updateCategoryScore("seo", audit.score_seo);
+        updateCategoryScore("a11y", audit.score_accessibility);
+        updateCategoryScore("sec", audit.score_security);
+        updateCategoryScore("tech", audit.score_technical);
+
+        renderFindings(currentFindings);
+      } catch (err) {
+        showToast("Failed to Load Report", err.message, "error");
+      }
+    }
+
+    function updateCategoryScore(key, score) {
+      const valEl = document.getElementById(`score-${key}`);
+      const pillEl = document.getElementById(`pill-${key}`);
+      if (!valEl || !pillEl) return;
+
+      const obj = getScoreDetails(score);
+      valEl.textContent = score !== null && score !== undefined ? Math.round(score) : "N/A";
+      pillEl.className = `score-pill ${obj.class}`;
+      pillEl.textContent = obj.label;
+    }
+
+    function renderFindings(findings) {
+      const container = document.getElementById("findings-list");
+      if (!container) return;
+
+      if (findings.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"><span data-icon="check"></span></div>
+            <h3 class="empty-state-title">No Findings Detected</h3>
+            <p class="empty-state-desc">All evaluated rules passed successfully without violations.</p>
+          </div>
+        `;
+        renderIcons(container);
+        return;
+      }
+
+      let html = "";
+      findings.forEach((f) => {
+        const severityClass = `severity-${(f.severity || "info").toLowerCase()}`;
+        html += `
+          <div class="finding-card ${severityClass}">
+            <div class="finding-header">
+              <div class="finding-title">${escapeHtml(f.title)}</div>
+              <span class="badge badge-severity">${escapeHtml(f.severity)}</span>
+            </div>
+            
+            <div class="finding-meta">
+              <span>Category: <strong>${escapeHtml(f.category)}</strong></span> &bull;
+              <span>Rule ID: <code class="mono">${escapeHtml(f.rule_id)}</code></span> &bull;
+              <span>Confidence: <strong>${Math.round((f.confidence || 1.0) * 100)}%</strong></span>
+            </div>
+
+            <div class="finding-description">${escapeHtml(f.description)}</div>
+
+            ${f.selector ? `
+              <div class="evidence-box">
+                <div class="evidence-title">Affected DOM Selector</div>
+                <div class="code-snippet">${escapeHtml(f.selector)}</div>
+              </div>
+            ` : ""}
+
+            ${f.evidence_snippet ? `
+              <div class="evidence-box">
+                <div class="evidence-title">Traceable Evidence</div>
+                <div class="code-snippet">${escapeHtml(f.evidence_snippet)}</div>
+              </div>
+            ` : ""}
+
+            ${f.recommendation ? `
+              <div class="remediation-box">
+                <strong>Recommended Fix:</strong>
+                ${escapeHtml(f.recommendation)}
+              </div>
+            ` : ""}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      renderIcons(container);
+    }
+
+    function setupFilters() {
+      const buttons = document.querySelectorAll(".filter-capsule");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          buttons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const filter = btn.getAttribute("data-filter");
+          if (filter === "ALL") {
+            renderFindings(currentFindings);
+          } else {
+            const filtered = currentFindings.filter(f => f.severity === filter);
+            renderFindings(filtered);
+          }
+        });
+      });
+    }
+
+    function setupExports(auditId) {
+      const jsonBtn = document.getElementById("download-json-btn");
+      const pdfBtn = document.getElementById("download-pdf-btn");
+
+      if (jsonBtn) {
+        jsonBtn.addEventListener("click", async () => {
+          try {
+            const data = await apiClient.get(`/reports/${auditId}/json`);
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `webaudit360-audit-${auditId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Export Ready", "JSON report downloaded successfully.", "success");
+          } catch (err) {
+            showToast("Export Failed", err.message, "error");
+          }
+        });
+      }
+
+      if (pdfBtn) {
+        pdfBtn.addEventListener("click", () => {
+          window.open(`${CONFIG.API_BASE_URL}/reports/${auditId}/pdf`, "_blank");
+        });
+      }
+    }
+  </script>
+</body>
+</html>

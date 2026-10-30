@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequently Asked Questions — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <span data-icon="globe" data-icon-class="gradient-text"></span>
+        <span>WebAudit <span class="gradient-text">360</span></span>
+      </a>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding: var(--space-3xl) 0;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Help Center</div>
+        <h1 class="section-title">Frequently Asked Questions</h1>
+        <p class="section-subtitle">Exhaustive methodology, scoring formulas, testing boundaries, and crawl safeguards</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item active">
+          <button class="faq-question">
+            <span>What is the difference between single-page and full-website audits?</span>
+            <span data-icon="chevronDown"></span>
+          </button>
+          <div class="faq-answer">
+            A single-page audit inspects only the exact URL submitted and its directly loaded subresources. A full-website audit begins at the seed URL, retrieves robots.txt and sitemap.xml, and traverses internal hyperlinks within configured depth and page limits.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>How are category scores and the overall score computed?</span>
+            <span data-icon="chevronDown"></span>
+          </button>
+          <div class="faq-answer">
+            When all categories are measured, the overall score uses the versioned algorithm: Overall = (0.25 × Performance) + (0.20 × SEO) + (0.20 × Accessibility) + (0.25 × Security) + (0.10 × Best Practices). If modules are omitted or unavailable, the weights are dynamically normalized only across measured modules, and omitted categories are explicitly marked as N/A.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Why does automated accessibility testing not guarantee 100% WCAG conformance?</span>
+            <span data-icon="chevronDown"></span>
+          </button>
+          <div class="faq-answer">
+            Automated tools such as axe-core evaluate approximately 30% to 40% of WCAG success criteria (contrast, ARIA syntax, form labels). Criteria requiring cognitive context, meaningful text descriptions, and screen reader flow must be verified manually.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What are the requirements for authorized active security testing?</span>
+            <span data-icon="chevronDown"></span>
+          </button>
+          <div class="faq-answer">
+            Active vulnerability testing with OWASP ZAP is prohibited against third-party sites without written consent. Target domain owners must complete a cryptographic DNS TXT challenge (_webaudit360-challenge.&lt;domain&gt;) or HTTP well-known token challenge before active tests can be enqueued.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>How does WebAudit 360 defend against Server-Side Request Forgery (SSRF)?</span>
+            <span data-icon="chevronDown"></span>
+          </button>
+          <div class="faq-answer">
+            Every submitted URL, discovered crawl link, and redirect target is resolved to its IP addresses and validated against RFC 1918 private subnets, loopback ranges (127.0.0.0/8, ::1), link-local addresses, and cloud provider metadata IPs (169.254.169.254). Outbound socket pinning prevents DNS rebinding.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container text-center">
+      &copy; <span id="footer-year">2026</span> WebAudit 360. All Rights Reserved. Made by Harsh Patel.
+    </div>
+  </footer>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initFooterYear } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initFooterYear();
+
+      const faqItems = document.querySelectorAll(".faq-item");
+      faqItems.forEach((item) => {
+        const btn = item.querySelector(".faq-question");
+        if (btn) {
+          btn.addEventListener("click", () => {
+            const isActive = item.classList.contains("active");
+            faqItems.forEach((i) => i.classList.remove("active"));
+            if (!isActive) item.classList.add("active");
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

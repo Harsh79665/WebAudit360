@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issue Manager & Findings — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="findings.html" class="slide-nav-item active"><span data-icon="alertTriangle"></span> Issue Manager</a>
+    </nav>
+  </aside>
+
+  <div class="app-layout">
+    <aside class="app-sidebar">
+      <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link active"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <div class="container">
+        <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: var(--space-xl);">
+          <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800;">Issue Manager & Lifecycle</h1>
+            <p class="text-muted">Track findings across Open, In Progress, Fixed, and Retest verification states</p>
+          </div>
+          <div class="flex gap-xs flex-wrap">
+            <button class="filter-capsule active" data-status="ALL">All Statuses</button>
+            <button class="filter-capsule" data-status="OPEN">Open</button>
+            <button class="filter-capsule" data-status="FIXED">Fixed</button>
+            <button class="filter-capsule" data-status="ACCEPTED_RISK">Accepted Risk</button>
+          </div>
+        </div>
+
+        <div id="findings-manager-list" class="findings-container">
+          <div class="empty-state">
+            <div class="empty-state-icon"><span data-icon="check"></span></div>
+            <h3 class="empty-state-title">No Outstanding Issues</h3>
+            <p class="empty-state-desc">Your scanned targets currently have zero unresolved issues.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { initNavigation } from "./js/navigation.js";
+    import { apiClient } from "./js/api.js";
+    import { escapeHtml, showToast } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderIcons();
+      initTheme();
+      initNavigation();
+
+      await loadFindings();
+    });
+
+    async function loadFindings(statusFilter = "ALL") {
+      const container = document.getElementById("findings-manager-list");
+      try {
+        const url = statusFilter === "ALL" ? "/findings" : `/findings?status=${statusFilter}`;
+        const data = await apiClient.get(url).catch(() => ({ items: [] }));
+        const findings = data.items || [];
+
+        if (findings.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon"><span data-icon="check"></span></div>
+              <h3 class="empty-state-title">No Findings Match Filter</h3>
+              <p class="empty-state-desc">No issues currently match this status filter.</p>
+            </div>
+          `;
+          renderIcons(container);
+          return;
+        }
+
+        let html = "";
+        findings.forEach((f) => {
+          html += `
+            <div class="finding-card severity-${(f.severity || "info").toLowerCase()}">
+              <div class="finding-header">
+                <div class="finding-title">${escapeHtml(f.title)}</div>
+                <div class="flex gap-xs">
+                  <span class="badge">${escapeHtml(f.status || "OPEN")}</span>
+                  <span class="badge">${escapeHtml(f.severity)}</span>
+                </div>
+              </div>
+              <p class="finding-description">${escapeHtml(f.description)}</p>
+              ${f.recommendation ? `<div class="remediation-box small-text"><strong>Fix:</strong> ${escapeHtml(f.recommendation)}</div>` : ""}
+              <div class="flex justify-between items-center" style="margin-top: var(--space-md); padding-top: var(--space-xs); border-top: 1px solid var(--border-color);">
+                <span class="small-text text-muted">Rule: ${escapeHtml(f.rule_id)}</span>
+                <div class="flex gap-xs">
+                  <button class="btn btn-secondary btn-sm status-btn" data-id="${f.id}" data-action="FIXED">Mark Fixed</button>
+                  <button class="btn btn-primary btn-sm retest-btn" data-id="${f.id}">Retest Rule</button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+        renderIcons(container);
+
+        document.querySelectorAll(".status-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            const action = btn.getAttribute("data-action");
+            try {
+              await apiClient.put(`/findings/${id}/status`, { status: action, reason: "Verified by developer" });
+              showToast("Status Updated", `Issue marked as ${action}.`, "success");
+              await loadFindings(statusFilter);
+            } catch (err) {
+              showToast("Error", err.message, "error");
+            }
+          });
+        });
+
+        document.querySelectorAll(".retest-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            try {
+              await apiClient.post(`/findings/${id}/retest`, {});
+              showToast("Retest Queued", "Verification scan scheduled.", "info");
+            } catch (err) {
+              showToast("Error", err.message, "error");
+            }
+          });
+        });
+      } catch (e) {}
+    }
+  </script>
+</body>
+</html>

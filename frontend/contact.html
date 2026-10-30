@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-brand">
+        <span data-icon="globe" data-icon-class="gradient-text"></span>
+        <span>WebAudit <span class="gradient-text">360</span></span>
+      </a>
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding: var(--space-3xl) 0;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Direct Communication</div>
+        <h1 class="section-title">Contact & Support</h1>
+        <p class="section-subtitle">Reach out directly to Harsh Patel regarding WebAudit 360 platform inquiries</p>
+      </div>
+
+      <div class="contact-container">
+        <form id="contact-page-form">
+          <div class="form-group">
+            <label for="contact-name" class="form-label">Full Name</label>
+            <input type="text" id="contact-name" class="form-input" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-email" class="form-label">Email Address</label>
+            <input type="email" id="contact-email" class="form-input" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-subject" class="form-label">Subject</label>
+            <input type="text" id="contact-subject" class="form-input" placeholder="Inquiry topic" required>
+          </div>
+          <div class="form-group">
+            <label for="contact-message" class="form-label">Message</label>
+            <textarea id="contact-message" class="form-textarea" rows="4" placeholder="How can we assist you?" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-full">
+            <span data-icon="fileText"></span>
+            <span>Send Message</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container text-center">
+      &copy; <span id="footer-year">2026</span> WebAudit 360. All Rights Reserved. Made by Harsh Patel.
+    </div>
+  </footer>
+
+  <script type="module">
+    import { renderIcons } from "./js/icons.js";
+    import { initTheme } from "./js/theme.js";
+    import { showToast, initFooterYear } from "./js/utils.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderIcons();
+      initTheme();
+      initFooterYear();
+
+      const form = document.getElementById("contact-page-form");
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          showToast("Message Received", "Thank you for reaching out to Harsh Patel. We will review your message promptly.", "success");
+          form.reset();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

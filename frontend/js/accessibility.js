@@ -136,3 +136,4 @@ export async function loadAccessibilityData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load accessibility findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

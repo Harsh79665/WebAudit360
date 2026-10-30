@@ -117,3 +117,4 @@ window.deleteProject = async function(projectId) {
     showToast(err.message || "Failed to delete project", "error");
   }
 };
+

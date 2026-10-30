@@ -116,3 +116,4 @@ window.deleteSchedule = async function(scheduleId) {
     showToast(err.message || "Failed to delete schedule", "error");
   }
 };
+

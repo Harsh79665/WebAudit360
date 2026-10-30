@@ -117,3 +117,4 @@ export async function loadDashboardData() {
     console.warn("Failed to load dashboard data:", err);
   }
 }
+

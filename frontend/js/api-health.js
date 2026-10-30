@@ -98,3 +98,4 @@ export async function loadApiHealthData() {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load API health telemetry: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

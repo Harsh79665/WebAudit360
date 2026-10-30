@@ -136,3 +136,4 @@ export async function loadTechnicalData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load technical findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

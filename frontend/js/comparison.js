@@ -162,3 +162,4 @@ export async function executeComparison(idA, idB) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to execute comparison: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

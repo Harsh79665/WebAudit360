@@ -137,3 +137,4 @@ export async function loadTechnologyData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load technology stack: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

@@ -134,3 +134,4 @@ export async function loadDomainData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load domain diagnostics: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

@@ -150,3 +150,4 @@ export async function loadStructureData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load website structure: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

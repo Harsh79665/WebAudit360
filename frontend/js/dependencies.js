@@ -132,3 +132,4 @@ export async function loadDependenciesData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load dependencies: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

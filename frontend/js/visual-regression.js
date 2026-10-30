@@ -100,3 +100,4 @@ export async function loadVisualData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load visual data: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

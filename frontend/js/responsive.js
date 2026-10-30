@@ -136,3 +136,4 @@ export async function loadResponsiveData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load responsive findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

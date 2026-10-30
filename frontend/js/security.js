@@ -154,3 +154,4 @@ window.requestDomainAuth = async function(targetUrl) {
     showToast("Invalid domain URL", "error");
   }
 };
+

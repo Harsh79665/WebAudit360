@@ -138,3 +138,4 @@ export async function loadPerformanceData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load performance metrics: ${escapeHtml(err.message)}</p></div>`;
   }
 }
+

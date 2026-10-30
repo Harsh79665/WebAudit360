@@ -29,11 +29,15 @@ async function populateAuditSelector() {
       return;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = parseInt(urlParams.get("id"), 10);
+    const targetAudit = audits.find(a => a.id === requestedId) || audits[0];
+
     auditSelect.innerHTML = audits.map(a => `
-      <option value="${a.id}">${escapeHtml(a.target_url)} (${a.device_profile}) - ${formatDate(a.created_at)}</option>
+      <option value="${a.id}" ${a.id === targetAudit.id ? 'selected' : ''}>${escapeHtml(a.target_url)} (${a.device_profile}) - ${formatDate(a.created_at)}</option>
     `).join("");
 
-    await loadAccessibilityData(audits[0].id);
+    await loadAccessibilityData(targetAudit.id);
   } catch (e) {
     console.warn("Failed to load audits for Accessibility:", e);
   }

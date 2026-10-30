@@ -29,11 +29,15 @@ async function populateAuditSelector() {
       return;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = parseInt(urlParams.get("id"), 10);
+    const targetAudit = audits.find(a => a.id === requestedId) || audits[0];
+
     auditSelect.innerHTML = audits.map(a => `
-      <option value="${a.id}">${escapeHtml(a.target_url)} - ${formatDate(a.created_at)}</option>
+      <option value="${a.id}" ${a.id === targetAudit.id ? 'selected' : ''}>${escapeHtml(a.target_url)} - ${formatDate(a.created_at)}</option>
     `).join("");
 
-    await loadResponsiveData(audits[0].id);
+    await loadResponsiveData(targetAudit.id);
   } catch (e) {
     console.warn("Failed to load audits for Responsive:", e);
   }

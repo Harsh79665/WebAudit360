@@ -239,6 +239,14 @@
       await loadReport(auditId);
       setupFilters();
       setupExports(auditId);
+
+      // Append current audit ID to specialized engine links for seamless deep inspection
+      document.querySelectorAll(".app-sidebar-link, .slide-nav-item").forEach(link => {
+        const href = link.getAttribute("href");
+        if (href && href.endsWith(".html") && !href.startsWith("#") && !href.includes("?")) {
+          link.setAttribute("href", `${href}?id=${auditId}`);
+        }
+      });
     });
 
     async function loadReport(auditId) {

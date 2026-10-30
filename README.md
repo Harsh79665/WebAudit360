@@ -294,16 +294,26 @@ Review `.env` and set your `SECRET_KEY`. By default, `DATABASE_URL` will automat
 alembic upgrade head
 ```
 
-### 5. Launch the Development Server
+### 5. Launch Full-Stack Server in One Single Command
+
+Run both Frontend (all 30 HTML views) and Backend (FastAPI, WebSockets, background scanner) simultaneously using either command:
 
 ```bash
+# Recommended single command (Django-style runner)
+python manage.py runserver
+
+# Or direct runner alias:
+python run.py
+
+# Or via uvicorn directly:
 uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Open your browser to:
 - **Application Web UI:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Live Audit Dashboard:** [http://127.0.0.1:8000/dashboard.html](http://127.0.0.1:8000/dashboard.html)
 - **Interactive Swagger Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **OpenAPI JSON Schema:** [http://127.0.0.1:8000/openapi.json](http://127.0.0.1:8000/openapi.json)
+- **OpenAPI JSON Schema:** [http://127.0.0.1:8000/api/v1/openapi.json](http://127.0.0.1:8000/api/v1/openapi.json)
 
 ### 6. Launch Celery Background Worker (Optional for Async Queue)
 

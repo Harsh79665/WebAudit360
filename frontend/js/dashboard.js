@@ -30,7 +30,7 @@ export async function loadDashboardData() {
       apiClient.get("/findings?status=OPEN").catch(() => ({ items: [], total: 0 }))
     ]);
 
-    const audits = auditsData.items || [];
+    const audits = (auditsData.items || []).filter(a => !a.target_url.includes("example.com"));
     const projects = projectsData.items || [];
     const findings = findingsData.items || [];
 

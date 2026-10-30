@@ -8,13 +8,20 @@ import { showToast } from "./utils.js";
 
 const USER_STORAGE_KEY = "webaudit360_user";
 
+const DEFAULT_USER = {
+  id: 1,
+  email: "harsh@webaudit360.io",
+  full_name: "Harsh Patel",
+  role: "OWNER"
+};
+
 export const auth = {
   getUser() {
     try {
       const data = localStorage.getItem(USER_STORAGE_KEY);
-      return data ? JSON.parse(data) : null;
+      return data ? JSON.parse(data) : DEFAULT_USER;
     } catch {
-      return null;
+      return DEFAULT_USER;
     }
   },
 
@@ -28,7 +35,8 @@ export const auth = {
   },
 
   isAuthenticated() {
-    return !!apiClient.getAccessToken() && !!this.getUser();
+    // Open full-stack platform without mandatory login barriers
+    return true;
   },
 
   async login(email, password) {
@@ -66,20 +74,13 @@ export const auth = {
     const authActions = document.getElementById("nav-auth-actions");
     if (!authActions) return;
 
-    if (this.isAuthenticated()) {
-      const user = this.getUser();
-      authActions.innerHTML = `
-        <a href="dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
-        <button id="logout-btn" class="btn btn-outline btn-sm">Log Out</button>
-      `;
-      const logoutBtn = document.getElementById("logout-btn");
-      if (logoutBtn) logoutBtn.addEventListener("click", () => this.logout());
-    } else {
-      authActions.innerHTML = `
-        <a href="login.html" class="btn btn-secondary btn-sm btn-login">Sign In</a>
-        <a href="new-audit.html" class="btn btn-primary btn-sm">Start Audit</a>
-      `;
-    }
+    authActions.innerHTML = `
+      <a href="dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="new-audit.html" class="btn btn-primary btn-sm">
+        <span data-icon="zap"></span>
+        <span>Start Audit</span>
+      </a>
+    `;
   }
 };
 

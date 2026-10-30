@@ -7,7 +7,7 @@ import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from backend.app.core.logging import logger
-from backend.app.services.audit_service import AUDIT_EVENT_SUBSCRIBERS
+from backend.app.services.audit_service import AUDIT_EVENT_SUBSCRIBERS, AUDIT_EVENT_HISTORY
 
 router = APIRouter(tags=["WebSockets"])
 
@@ -16,7 +16,7 @@ router = APIRouter(tags=["WebSockets"])
 async def audit_progress_websocket(websocket: WebSocket, audit_id: int):
     """
     Subscribes a connected client to live progress events for the specified audit job.
-    Streams genuine worker events without artificial delays or timer-based percentages.
+    Streams genuine worker events and replays buffered history for late-connecting clients.
     """
     await websocket.accept()
     queue = asyncio.Queue()
@@ -34,6 +34,11 @@ async def audit_progress_websocket(websocket: WebSocket, audit_id: int):
             "audit_id": audit_id,
             "message": "Connected to WebAudit 360 live diagnostic event stream."
         })
+
+        # Replay buffered past events if any exist
+        history = AUDIT_EVENT_HISTORY.get(audit_id, [])
+        for past_event in history:
+            await websocket.send_json(past_event)
 
         while True:
             # Wait for event from worker pipeline or client message

@@ -38,10 +38,15 @@ from backend.app.scoring.calculator import calculate_overall_score
 
 # Active WebSocket subscriber queues keyed by audit_id
 AUDIT_EVENT_SUBSCRIBERS: Dict[int, List[asyncio.Queue]] = {}
+AUDIT_EVENT_HISTORY: Dict[int, List[Dict[str, Any]]] = {}
 
 
 async def broadcast_audit_event(audit_id: int, event: Dict[str, Any]):
-    """Broadcasts a live scan lifecycle event to all connected WebSocket clients."""
+    """Broadcasts a live scan lifecycle event to all connected WebSocket clients and buffers history."""
+    if audit_id not in AUDIT_EVENT_HISTORY:
+        AUDIT_EVENT_HISTORY[audit_id] = []
+    AUDIT_EVENT_HISTORY[audit_id].append(event)
+
     subscribers = AUDIT_EVENT_SUBSCRIBERS.get(audit_id, [])
     for q in subscribers:
         await q.put(event)
@@ -71,6 +76,8 @@ class AuditService:
             "type": "audit_started",
             "audit_id": audit_id,
             "target_url": audit.target_url,
+            "percent": 10,
+            "message": "Sandbox initialized. Validating SSRF defenses and resolving target...",
             "timestamp": datetime.now(timezone.utc).isoformat()
         })
 
@@ -92,7 +99,12 @@ class AuditService:
         try:
             # Step A: Crawler Engine
             crawler = CrawlerEngine()
-            await broadcast_audit_event(audit_id, {"type": "module_started", "module": "CRAWLER"})
+            await broadcast_audit_event(audit_id, {
+                "type": "module_started",
+                "module": "CRAWLER",
+                "percent": 20,
+                "message": "Crawler engine active. Discovering internal page hierarchy..."
+            })
             crawl_res = await crawler.execute(target_url, {
                 "scan_mode": audit.scan_mode.value,
                 "max_pages": audit.config.get("max_pages", 50),
@@ -128,48 +140,94 @@ class AuditService:
                 "type": "crawler_progress",
                 "discovered": audit.pages_discovered,
                 "scanned": audit.pages_scanned,
-                "current_page": target_url
+                "current_page": target_url,
+                "percent": 28,
+                "message": f"Crawled {audit.pages_scanned} pages successfully."
             })
 
             # Step B: SEO Engine
             if "SEO" in selected_modules:
-                await broadcast_audit_event(audit_id, {"type": "module_started", "module": "SEO"})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_started",
+                    "module": "SEO",
+                    "percent": 35,
+                    "message": "Auditing SEO metadata, heading hierarchy, and Open Graph cards..."
+                })
                 seo_engine = SEOEngine()
                 seo_res = await seo_engine.execute(target_url, {})
                 score_seo = seo_res.score
                 raw_results["SEO"] = seo_res.raw_evidence
                 AuditService._persist_findings(session, audit_id, primary_page_id, seo_res.findings)
-                await broadcast_audit_event(audit_id, {"type": "module_completed", "module": "SEO", "score": score_seo})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_completed",
+                    "module": "SEO",
+                    "score": score_seo,
+                    "percent": 45,
+                    "message": f"SEO inspection finished (Score: {score_seo or 'N/A'})."
+                })
 
             # Step C: Passive Security Engine
             if "SECURITY_PASSIVE" in selected_modules or "SECURITY" in selected_modules:
-                await broadcast_audit_event(audit_id, {"type": "module_started", "module": "SECURITY_PASSIVE"})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_started",
+                    "module": "SECURITY_PASSIVE",
+                    "percent": 50,
+                    "message": "Auditing security headers (HSTS, CSP, X-Frame-Options) and TLS posture..."
+                })
                 sec_engine = PassiveSecurityEngine()
                 sec_res = await sec_engine.execute(target_url, {})
                 score_sec = sec_res.score
                 raw_results["SECURITY_PASSIVE"] = sec_res.raw_evidence
                 AuditService._persist_findings(session, audit_id, primary_page_id, sec_res.findings)
-                await broadcast_audit_event(audit_id, {"type": "module_completed", "module": "SECURITY_PASSIVE", "score": score_sec})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_completed",
+                    "module": "SECURITY_PASSIVE",
+                    "score": score_sec,
+                    "percent": 60,
+                    "message": f"Security headers audit finished (Score: {score_sec or 'N/A'})."
+                })
 
             # Step D: Performance Engine (Lighthouse & Playwright)
             if "PERFORMANCE" in selected_modules:
-                await broadcast_audit_event(audit_id, {"type": "module_started", "module": "PERFORMANCE"})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_started",
+                    "module": "PERFORMANCE",
+                    "percent": 65,
+                    "message": "Measuring Navigation Timing Level 2 and Core Web Vitals via headless Chromium..."
+                })
                 perf_engine = PerformanceEngine()
                 perf_res = await perf_engine.execute(target_url, {"device_profile": audit.device_profile.value})
                 score_perf = perf_res.score
                 raw_results["PERFORMANCE"] = perf_res.raw_evidence
                 AuditService._persist_findings(session, audit_id, primary_page_id, perf_res.findings)
-                await broadcast_audit_event(audit_id, {"type": "module_completed", "module": "PERFORMANCE", "score": score_perf})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_completed",
+                    "module": "PERFORMANCE",
+                    "score": score_perf,
+                    "percent": 75,
+                    "message": f"Performance telemetry complete (Score: {score_perf or 'N/A'})."
+                })
 
             # Step E: Accessibility Engine (axe-core via Playwright)
             if "ACCESSIBILITY" in selected_modules:
-                await broadcast_audit_event(audit_id, {"type": "module_started", "module": "ACCESSIBILITY"})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_started",
+                    "module": "ACCESSIBILITY",
+                    "percent": 78,
+                    "message": "Auditing WCAG 2.1/2.2 AA accessibility rules, contrast, and ARIA tree..."
+                })
                 a11y_engine = AccessibilityEngine()
                 a11y_res = await a11y_engine.execute(target_url, {})
                 score_a11y = a11y_res.score
                 raw_results["ACCESSIBILITY"] = a11y_res.raw_evidence
                 AuditService._persist_findings(session, audit_id, primary_page_id, a11y_res.findings)
-                await broadcast_audit_event(audit_id, {"type": "module_completed", "module": "ACCESSIBILITY", "score": score_a11y})
+                await broadcast_audit_event(audit_id, {
+                    "type": "module_completed",
+                    "module": "ACCESSIBILITY",
+                    "score": score_a11y,
+                    "percent": 86,
+                    "message": f"Accessibility evaluation complete (Score: {score_a11y or 'N/A'})."
+                })
 
             # Step F: Responsive Engine
             if "RESPONSIVE" in selected_modules:
@@ -198,6 +256,12 @@ class AuditService:
             raw_results["DOMAIN"] = domain_res.raw_evidence
             AuditService._persist_findings(session, audit_id, primary_page_id, domain_res.findings)
 
+            await broadcast_audit_event(audit_id, {
+                "type": "progress_update",
+                "percent": 95,
+                "message": "Calculating transparent v1.0.0 score matrix across all measured modules..."
+            })
+
             # Calculate Overall Score using transparent versioned algorithm
             overall_score, scoring_meta = calculate_overall_score(
                 score_perf=score_perf,
@@ -223,8 +287,10 @@ class AuditService:
             await broadcast_audit_event(audit_id, {
                 "type": "audit_completed",
                 "audit_id": audit_id,
+                "percent": 100,
                 "overall_score": overall_score,
-                "execution_time_ms": audit.execution_time_ms
+                "execution_time_ms": audit.execution_time_ms,
+                "message": f"Audit successfully completed with overall score {round(overall_score, 1)}/100."
             })
             logger.info(f"Audit #{audit_id} completed successfully with score {overall_score}.")
 

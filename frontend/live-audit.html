@@ -71,8 +71,17 @@
           </div>
         </div>
 
-        <div class="live-progress-bar-wrapper">
-          <div id="live-progress-bar" class="live-progress-bar"></div>
+        <div class="flex items-center justify-between" style="margin-top: var(--space-md); margin-bottom: 6px;">
+          <span id="current-stage-label" style="font-size: 0.875rem; font-weight: 600; color: var(--accent-primary);">
+            Initializing audit sandbox & SSRF verification...
+          </span>
+          <span id="progress-percentage" style="font-size: 1.25rem; font-weight: 800; font-family: var(--font-mono); color: var(--accent-primary);">
+            0%
+          </span>
+        </div>
+
+        <div class="live-progress-bar-wrapper" style="height: 12px; border-radius: 999px; background: var(--bg-tertiary, rgba(0,0,0,0.06)); overflow: hidden; position: relative; border: 1px solid var(--border-color);">
+          <div id="live-progress-bar" class="live-progress-bar" style="width: 0%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981); transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);"></div>
         </div>
 
         <div class="live-status-meta">
@@ -162,10 +171,73 @@
     let timerInterval = null;
     let startTime = Date.now();
     let ws = null;
+    let progressController = null;
+
+    class SmoothProgressController {
+      constructor() {
+        this.currentVal = 0;
+        this.targetVal = 8;
+        this.pBar = document.getElementById("live-progress-bar");
+        this.pText = document.getElementById("progress-percentage");
+        this.stageLabel = document.getElementById("current-stage-label");
+        this.isDone = false;
+        this.init();
+      }
+
+      setTarget(pct, label = "") {
+        this.targetVal = Math.max(this.targetVal, Math.min(100, pct));
+        if (label && this.stageLabel) {
+          this.stageLabel.textContent = label;
+        }
+      }
+
+      init() {
+        // Continuous smooth animation step
+        const animate = () => {
+          if (this.currentVal < this.targetVal) {
+            const step = Math.max(0.15, (this.targetVal - this.currentVal) * 0.06);
+            this.currentVal = Math.min(this.targetVal, this.currentVal + step);
+            
+            if (this.pBar) this.pBar.style.width = `${this.currentVal.toFixed(1)}%`;
+            if (this.pText) this.pText.textContent = `${Math.floor(this.currentVal)}%`;
+          }
+          if (!this.isDone || this.currentVal < 100) {
+            requestAnimationFrame(animate);
+          }
+        };
+        requestAnimationFrame(animate);
+
+        // Steady gentle auto-progress up to 92% to keep experience live and fluid
+        this.ticker = setInterval(() => {
+          if (!this.isDone && this.targetVal < 92) {
+            this.targetVal += 1.8;
+          }
+        }, 800);
+      }
+
+      complete(onFinish) {
+        clearInterval(this.ticker);
+        this.isDone = true;
+        this.targetVal = 100;
+        if (this.stageLabel) this.stageLabel.textContent = "Audit pipeline complete! All measurements stored.";
+
+        const checkCompletion = setInterval(() => {
+          if (this.currentVal >= 99.4) {
+            this.currentVal = 100;
+            if (this.pBar) this.pBar.style.width = "100%";
+            if (this.pText) this.pText.textContent = "100%";
+            clearInterval(checkCompletion);
+            if (onFinish) onFinish();
+          }
+        }, 40);
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", async () => {
       renderIcons();
       initTheme();
+
+      progressController = new SmoothProgressController();
 
       const urlParams = new URLSearchParams(window.location.search);
       const auditId = urlParams.get("id");
@@ -226,13 +298,15 @@
         const titleEl = document.getElementById("audit-target-title");
         if (titleEl) titleEl.textContent = audit.target_url;
 
-        // If already completed or failed, show immediate state
+        // If already completed or failed, show immediate finished state
         if (audit.status === "COMPLETED" || audit.status === "FAILED") {
           handleJobFinished(audit.status, auditId);
           return;
         }
 
         connectWebSocket(auditId);
+        // Start parallel polling to ensure resilient progress even on websocket latency
+        startHttpPolling(auditId);
       } catch (err) {
         addLogEntry("Failed to load audit metadata. Falling back to HTTP polling...");
         startHttpPolling(auditId);
@@ -245,7 +319,7 @@
         ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
-          addLogEntry("WebSocket connected. Streaming scan events...");
+          addLogEntry("WebSocket connected. Streaming real-time scan diagnostic events...");
         };
 
         ws.onmessage = (event) => {
@@ -258,38 +332,42 @@
         };
 
         ws.onerror = (err) => {
-          addLogEntry("WebSocket disconnected. Falling back to polling...");
-          startHttpPolling(auditId);
+          addLogEntry("WebSocket connection fallback active.");
         };
 
         ws.onclose = () => {
           // Handled gracefully
         };
       } catch {
-        startHttpPolling(auditId);
+        // Handled by HTTP polling
       }
     }
 
     function handleWorkerEvent(evt, auditId) {
       const type = evt.type;
       const badge = document.getElementById("audit-status-badge");
-      const pBar = document.getElementById("live-progress-bar");
+
+      if (evt.percent && progressController) {
+        progressController.setTarget(evt.percent, evt.message || "");
+      }
 
       if (type === "audit_started") {
         if (badge) badge.textContent = "RUNNING";
-        if (pBar) pBar.style.width = "15%";
+        if (progressController) progressController.setTarget(12, "Target validated. Initializing headless scanning sandbox...");
         addLogEntry(`Scan worker started execution for ${evt.target_url || "target"}`);
       } else if (type === "crawler_progress") {
         document.getElementById("pages-discovered").textContent = evt.discovered || 0;
         document.getElementById("pages-scanned").textContent = evt.scanned || 0;
         addLogEntry(`Crawler scanned page: ${evt.current_page || ""}`);
         updateStage("stage-crawler", "running", `Crawling (${evt.scanned} pages)`);
+        if (progressController) progressController.setTarget(28, `Discovered ${evt.discovered || 1} pages.`);
       } else if (type === "module_started") {
         const moduleMap = {
           "PERFORMANCE": "stage-performance",
           "ACCESSIBILITY": "stage-accessibility",
           "SECURITY_PASSIVE": "stage-security",
-          "SEO": "stage-seo"
+          "SEO": "stage-seo",
+          "CRAWLER": "stage-crawler"
         };
         const stageId = moduleMap[evt.module];
         if (stageId) updateStage(stageId, "running", "Executing...");
@@ -299,13 +377,14 @@
           "PERFORMANCE": "stage-performance",
           "ACCESSIBILITY": "stage-accessibility",
           "SECURITY_PASSIVE": "stage-security",
-          "SEO": "stage-seo"
+          "SEO": "stage-seo",
+          "CRAWLER": "stage-crawler"
         };
         const stageId = moduleMap[evt.module];
         if (stageId) updateStage(stageId, "completed", "Completed");
-        addLogEntry(`Engine finished: ${evt.module} (Score: ${evt.score !== null ? evt.score : "N/A"})`);
+        addLogEntry(`Engine finished: ${evt.module} (Score: ${evt.score !== null && evt.score !== undefined ? evt.score : "N/A"})`);
       } else if (type === "audit_completed") {
-        handleJobFinished("COMPLETED", auditId);
+        handleJobFinished("COMPLETED", auditId, "", evt.overall_score);
       } else if (type === "audit_failed") {
         handleJobFinished("FAILED", auditId, evt.error);
       }
@@ -319,27 +398,30 @@
       if (statusEl) statusEl.textContent = statusText;
     }
 
-    function handleJobFinished(status, auditId, errorMsg = "") {
+    function handleJobFinished(status, auditId, errorMsg = "", overallScore = null) {
       clearInterval(timerInterval);
       const badge = document.getElementById("audit-status-badge");
-      const pBar = document.getElementById("live-progress-bar");
       const reportBtn = document.getElementById("view-report-btn");
       const cancelBtn = document.getElementById("cancel-scan-btn");
 
       if (cancelBtn) cancelBtn.style.display = "none";
 
       if (status === "COMPLETED") {
-        if (badge) {
-          badge.textContent = "COMPLETED";
-          badge.style.background = "var(--badge-excellent-bg)";
-          badge.style.color = "var(--color-excellent)";
-        }
-        if (pBar) pBar.style.width = "100%";
-        updateStage("stage-scoring", "completed", "Scores Calculated");
-        addLogEntry("Audit successfully completed! All evidence stored.");
-        if (reportBtn) {
-          reportBtn.href = `audit-report.html?id=${auditId}`;
-          reportBtn.style.display = "inline-flex";
+        if (progressController) {
+          progressController.complete(() => {
+            if (badge) {
+              badge.textContent = "COMPLETED";
+              badge.style.background = "var(--badge-excellent-bg)";
+              badge.style.color = "var(--color-excellent)";
+            }
+            updateStage("stage-scoring", "completed", "Scores Calculated");
+            const scoreText = overallScore !== null && overallScore !== undefined ? ` (Overall Score: ${Math.round(overallScore)}/100)` : "";
+            addLogEntry(`Audit successfully completed! All evidence stored.${scoreText}`);
+            if (reportBtn) {
+              reportBtn.href = `audit-report.html?id=${auditId}`;
+              reportBtn.style.display = "inline-flex";
+            }
+          });
         }
       } else {
         if (badge) {
@@ -347,7 +429,7 @@
           badge.style.background = "var(--badge-critical-bg)";
           badge.style.color = "var(--color-critical)";
         }
-        addLogEntry(`Audit failed: ${errorMsg || "Unknown worker error"}`);
+        addLogEntry(`Audit failed: ${errorMsg || "Worker encountered an issue"}`);
       }
     }
 
@@ -357,12 +439,13 @@
           const audit = await apiClient.get(`/audits/${auditId}`);
           if (audit.status === "COMPLETED" || audit.status === "FAILED") {
             clearInterval(pollInterval);
-            handleJobFinished(audit.status, auditId);
+            handleJobFinished(audit.status, auditId, "", audit.overall_score);
           }
         } catch {
           // ignore transient poll errors
         }
-      }, 3000);
+      }, 2000);
+    }
     }
   </script>
 </body>

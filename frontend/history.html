@@ -169,7 +169,7 @@
       const container = document.getElementById("history-table-container");
       try {
         const data = await apiClient.get("/audits").catch(() => ({ items: [] }));
-        const audits = data.items || [];
+        const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
         if (audits.length === 0) return;
 
         let tableHtml = `

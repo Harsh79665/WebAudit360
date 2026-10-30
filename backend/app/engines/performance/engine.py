@@ -8,6 +8,7 @@ Evaluates:
 - DOM size, render-blocking stylesheets/scripts, image payload analysis
 """
 
+import asyncio
 import json
 import os
 import shutil
@@ -180,7 +181,7 @@ class PerformanceEngine(BaseAuditEngine):
         output_path = os.path.join(temp_dir, "lighthouse_result.json")
 
         cmd = [
-            "npx", "lighthouse", url,
+            "npx", "--yes", "lighthouse", url,
             "--output=json",
             f"--output-path={output_path}",
             f"--form-factor={form_factor}",
@@ -195,7 +196,7 @@ class PerformanceEngine(BaseAuditEngine):
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-            await asyncio.wait_for(process.communicate(), timeout=45.0)
+            await asyncio.wait_for(process.communicate(), timeout=20.0)
 
             if os.path.exists(output_path):
                 with open(output_path, "r", encoding="utf-8") as f:

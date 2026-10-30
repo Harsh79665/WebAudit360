@@ -66,7 +66,7 @@
         </div>
 
         <div id="nav-auth-actions" class="flex items-center gap-xs">
-          <a href="login.html" class="btn btn-secondary btn-sm btn-login">Sign In</a>
+          <a href="dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
           <a href="new-audit.html" class="btn btn-primary btn-sm">Start Audit</a>
         </div>
       </div>
@@ -579,6 +579,7 @@
     import { initTheme } from "./js/theme.js";
     import { initNavigation } from "./js/navigation.js";
     import { auth } from "./js/auth.js";
+    import { apiClient } from "./js/api.js";
     import { validateUrl, showToast, initFooterYear } from "./js/utils.js";
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -588,11 +589,12 @@
       initFooterYear();
       auth.updateNavAuthState();
 
-      // Setup Hero Audit Form submission
+      // Setup Hero Audit Form submission with real-time launch
       const heroForm = document.getElementById("hero-audit-form");
       const heroInput = document.getElementById("hero-url-input");
+      const heroBtn = document.getElementById("hero-submit-btn");
       if (heroForm && heroInput) {
-        heroForm.addEventListener("submit", (e) => {
+        heroForm.addEventListener("submit", async (e) => {
           e.preventDefault();
           const targetUrl = heroInput.value.trim();
           const validation = validateUrl(targetUrl);
@@ -602,9 +604,37 @@
             return;
           }
 
-          // Store preselected target in sessionStorage and redirect to new audit
-          sessionStorage.setItem("webaudit360_prefill_url", validation.url);
-          window.location.href = "new-audit.html";
+          if (heroBtn) {
+            heroBtn.disabled = true;
+            heroBtn.innerHTML = `<span style="display:inline-block; width:16px; height:16px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.6s linear infinite; margin-right:8px;"></span> Initializing...`;
+          }
+
+          showToast("Launching Real-Time Audit", `Initiating multi-layer audit for ${validation.url}...`, "info");
+
+          try {
+            const auditPayload = {
+              target_url: validation.url,
+              scan_mode: "SINGLE_PAGE",
+              device_profile: "BOTH",
+              selected_modules: [
+                "PERFORMANCE", "SEO", "ACCESSIBILITY", "SECURITY_PASSIVE",
+                "RESPONSIVE", "TECHNICAL_HEALTH", "TECHNOLOGY", "THIRD_PARTY"
+              ],
+              max_pages: 50,
+              max_depth: 3,
+              concurrency: 2
+            };
+
+            const result = await apiClient.post("/audits", auditPayload);
+            window.location.href = `live-audit.html?id=${result.id}`;
+          } catch (err) {
+            showToast("Audit Launch Failed", err.message || "Failed to start audit. Please verify target domain.", "error");
+            if (heroBtn) {
+              heroBtn.disabled = false;
+              heroBtn.innerHTML = `<span data-icon="zap"></span><span>Start Audit</span>`;
+              renderIcons(heroBtn);
+            }
+          }
         });
       }
 

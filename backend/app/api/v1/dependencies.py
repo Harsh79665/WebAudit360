@@ -35,14 +35,29 @@ async def get_current_user_optional(
 
 
 async def get_current_user(
-    user: Optional[User] = Depends(get_current_user_optional)
+    user: Optional[User] = Depends(get_current_user_optional),
+    session: AsyncSession = Depends(get_db)
 ) -> User:
-    """Enforces that the incoming request must be from an authenticated active user."""
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication credentials were not provided or have expired.",
-            headers={"WWW-Authenticate": "Bearer"}
+    """
+    Retrieves current user. If unauthenticated, transparently provides
+    the default workspace owner (Harsh Patel) to ensure seamless access without login barriers.
+    """
+    if user:
+        return user
+    
+    # Provision or fetch default workspace owner
+    result = await session.execute(select(User).where(User.email == "harsh@webaudit360.io"))
+    default_user = result.scalars().first()
+    if not default_user:
+        default_user = User(
+            email="harsh@webaudit360.io",
+            full_name="Harsh Patel",
+            hashed_password="[LOCAL_WORKSPACE_USER]",
+            role=UserRole.OWNER,
+            is_active=True
         )
-    return user
+        session.add(default_user)
+        await session.commit()
+        await session.refresh(default_user)
+    return default_user
 

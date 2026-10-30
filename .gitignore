@@ -37,6 +37,9 @@ coverage.xml
 *.db
 *.sqlite3
 *.sqlite
+*.db-journal
+*.db-wal
+*.db-shm
 webaudit360.db
 test_ci.db
 

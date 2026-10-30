@@ -55,13 +55,15 @@ class PerformanceEngine(BaseAuditEngine):
         if lighthouse_cmd:
             lighthouse_data = await self._run_lighthouse(normalized_url, device_profile)
 
-        score = 85.0
+        score = None
         metrics = {}
 
         if lighthouse_data:
             categories = lighthouse_data.get("categories", {})
             perf_cat = categories.get("performance", {})
-            score = (perf_cat.get("score", 0.85) or 0.85) * 100.0
+            raw_score = perf_cat.get("score")
+            if raw_score is not None:
+                score = round(raw_score * 100.0, 1)
 
             audits = lighthouse_data.get("audits", {})
             fcp = audits.get("first-contentful-paint", {}).get("numericValue", 0)
@@ -114,20 +116,70 @@ class PerformanceEngine(BaseAuditEngine):
                     description="Total Blocking Time quantifies main-thread responsiveness. Long JavaScript tasks block user input during page load.",
                     recommendation="Code-split heavy bundles, defer non-critical third-party scripts, and offload CPU-intensive tasks to Web Workers."
                 ))
-        else:
-            # Fall back to Playwright Navigation Timing
-            metrics = browser_metrics
-            score = 80.0
-            if browser_metrics.get("ttfb_ms", 0) > 800:
+        elif browser_metrics and browser_metrics.get("total_load_ms", 0) > 0:
+            # Calculate authentic performance score from real Navigation Timing Level 2 measurements
+            metrics = {
+                "ttfb_ms": browser_metrics.get("ttfb_ms", 0),
+                "dom_interactive_ms": browser_metrics.get("dom_interactive_ms", 0),
+                "dom_complete_ms": browser_metrics.get("dom_complete_ms", 0),
+                "total_load_ms": browser_metrics.get("total_load_ms", 0),
+                "transfer_size_bytes": browser_metrics.get("transfer_size_bytes", 0),
+                "dom_elements_count": browser_metrics.get("dom_elements_count", 0),
+                "source": "Playwright Navigation Timing Level 2 (Real Measurement)"
+            }
+
+            calculated_score = 100.0
+            ttfb = browser_metrics.get("ttfb_ms", 0)
+            load_ms = browser_metrics.get("total_load_ms", 0)
+            dom_count = browser_metrics.get("dom_elements_count", 0)
+
+            # TTFB grading based on Web Vitals benchmarks
+            if ttfb > 1200:
+                calculated_score -= 25.0
+            elif ttfb > 800:
+                calculated_score -= 15.0
+            elif ttfb > 400:
+                calculated_score -= 5.0
+
+            # Full Page Load grading
+            if load_ms > 6000:
+                calculated_score -= 30.0
+            elif load_ms > 3500:
+                calculated_score -= 20.0
+            elif load_ms > 2000:
+                calculated_score -= 10.0
+
+            # DOM elements count grading
+            if dom_count > 2500:
+                calculated_score -= 15.0
+            elif dom_count > 1500:
+                calculated_score -= 8.0
+
+            score = max(0.0, min(100.0, round(calculated_score, 1)))
+
+            if ttfb > 800:
                 findings.append(FindingDraft(
                     category=AuditCategory.PERFORMANCE,
                     rule_id="perf-slow-ttfb",
                     severity="MEDIUM",
                     confidence=1.0,
-                    title=f"Slow Time to First Byte ({browser_metrics['ttfb_ms']}ms)",
+                    title=f"Slow Time to First Byte ({ttfb}ms)",
                     description="Server took more than 800ms to send the first byte of response data.",
                     recommendation="Implement server-side page caching, optimize database queries, or deploy an edge CDN."
                 ))
+            
+            if load_ms > 3500:
+                findings.append(FindingDraft(
+                    category=AuditCategory.PERFORMANCE,
+                    rule_id="perf-slow-page-load",
+                    severity="HIGH" if load_ms > 6000 else "MEDIUM",
+                    confidence=1.0,
+                    title=f"Slow Full Page Load ({round(load_ms / 1000, 2)}s)",
+                    description=f"Initial page render and resource loading completed in {round(load_ms / 1000, 2)} seconds.",
+                    recommendation="Minimize transfer sizes, compress assets, and eliminate render-blocking CSS/JS."
+                ))
+        else:
+            score = None
 
         execution_time_ms = int((time.time() - start_time) * 1000)
 

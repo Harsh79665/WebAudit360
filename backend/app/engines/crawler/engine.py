@@ -168,12 +168,20 @@ class CrawlerEngine(BaseAuditEngine):
 
         execution_time_ms = int((time.time() - start_time) * 1000)
 
+        # Calculate genuine technical health score from verified HTTP status codes
+        if not pages_data:
+            crawler_score = None
+        else:
+            healthy_count = sum(1 for p in pages_data if 0 < p.get("status_code", 0) < 400)
+            total_count = len(pages_data)
+            crawler_score = round((healthy_count / total_count) * 100.0, 1) if total_count > 0 else 100.0
+
         return EngineResult(
             category=AuditCategory.TECHNICAL_HEALTH,
             engine_name=self.engine_name,
             engine_version=self.engine_version,
             status=EngineStatus.SUCCESS if pages_data else EngineStatus.FAILED,
-            score=100.0 if not any(p.get("status_code", 0) >= 400 for p in pages_data) else 70.0,
+            score=crawler_score,
             findings=findings,
             raw_evidence={
                 "scan_mode": scan_mode,

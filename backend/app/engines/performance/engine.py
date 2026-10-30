@@ -15,7 +15,7 @@ import shutil
 import subprocess
 import tempfile
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from playwright.async_api import async_playwright
 
 from backend.app.core.logging import logger

@@ -15,7 +15,7 @@ Labels:
 - 0–24: Critical
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 SCORING_ALGORITHM_VERSION = "1.0.0"
 

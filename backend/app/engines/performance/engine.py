@@ -188,7 +188,7 @@ class PerformanceEngine(BaseAuditEngine):
             engine_name=self.engine_name,
             engine_version=self.engine_version,
             status=EngineStatus.SUCCESS,
-            score=round(score, 1),
+            score=round(score, 1) if score is not None else None,
             findings=findings,
             raw_evidence={"metrics": metrics, "browser": browser_metrics},
             limitations=limitations,

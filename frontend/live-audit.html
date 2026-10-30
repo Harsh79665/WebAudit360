@@ -172,6 +172,7 @@
     let startTime = Date.now();
     let ws = null;
     let progressController = null;
+    let isJobFinished = false;
 
     class SmoothProgressController {
       constructor() {
@@ -300,7 +301,7 @@
 
         // If already completed or failed, show immediate finished state
         if (audit.status === "COMPLETED" || audit.status === "FAILED") {
-          handleJobFinished(audit.status, auditId);
+          handleJobFinished(audit.status, auditId, "", audit.overall_score);
           return;
         }
 
@@ -359,8 +360,12 @@
         document.getElementById("pages-discovered").textContent = evt.discovered || 0;
         document.getElementById("pages-scanned").textContent = evt.scanned || 0;
         addLogEntry(`Crawler scanned page: ${evt.current_page || ""}`);
-        updateStage("stage-crawler", "running", `Crawling (${evt.scanned} pages)`);
+        updateStage("stage-crawler", "completed", `Crawled (${evt.scanned} pages)`);
         if (progressController) progressController.setTarget(28, `Discovered ${evt.discovered || 1} pages.`);
+      } else if (type === "progress_update") {
+        if (evt.percent >= 90) {
+          updateStage("stage-scoring", "running", "Calculating Score Matrix...");
+        }
       } else if (type === "module_started") {
         const moduleMap = {
           "PERFORMANCE": "stage-performance",
@@ -384,6 +389,7 @@
         if (stageId) updateStage(stageId, "completed", "Completed");
         addLogEntry(`Engine finished: ${evt.module} (Score: ${evt.score !== null && evt.score !== undefined ? evt.score : "N/A"})`);
       } else if (type === "audit_completed") {
+        updateStage("stage-scoring", "completed", "Scores Calculated");
         handleJobFinished("COMPLETED", auditId, "", evt.overall_score);
       } else if (type === "audit_failed") {
         handleJobFinished("FAILED", auditId, evt.error);
@@ -399,6 +405,8 @@
     }
 
     function handleJobFinished(status, auditId, errorMsg = "", overallScore = null) {
+      if (isJobFinished) return;
+      isJobFinished = true;
       clearInterval(timerInterval);
       const badge = document.getElementById("audit-status-badge");
       const reportBtn = document.getElementById("view-report-btn");
@@ -445,7 +453,6 @@
           // ignore transient poll errors
         }
       }, 2000);
-    }
     }
   </script>
 </body>

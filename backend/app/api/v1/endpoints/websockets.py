@@ -40,6 +40,11 @@ async def audit_progress_websocket(websocket: WebSocket, audit_id: int):
         for past_event in history:
             await websocket.send_json(past_event)
 
+        # If audit has already reached terminal state, close gracefully after replay
+        if any(e.get("type") in ("audit_completed", "audit_failed", "audit_cancelled") for e in history):
+            await asyncio.sleep(0.5)
+            return
+
         while True:
             # Wait for event from worker pipeline or client message
             event = await queue.get()

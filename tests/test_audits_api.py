@@ -5,8 +5,10 @@ Author: Harsh Patel
 import pytest
 import pytest_asyncio
 import httpx
+from sqlalchemy import delete
 from backend.app.main import app
-from backend.app.core.database import init_db
+from backend.app.core.database import init_db, AsyncSessionLocal
+from backend.app.models.entities import Audit, AuditFinding, AuditPage
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -54,6 +56,13 @@ async def test_audit_submission_valid_target():
         assert detail_res.status_code == 200
         detail_data = detail_res.json()
         assert detail_data["id"] == audit_id
+
+        # Clean up test audit so production/development database remains pristine
+        async with AsyncSessionLocal() as session:
+            await session.execute(delete(AuditFinding).where(AuditFinding.audit_id == audit_id))
+            await session.execute(delete(AuditPage).where(AuditPage.audit_id == audit_id))
+            await session.execute(delete(Audit).where(Audit.id == audit_id))
+            await session.commit()
 
 
 @pytest.mark.asyncio

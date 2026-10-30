@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -46,7 +46,7 @@ export async function loadTechnicalData(auditId) {
 
   try {
     const audit = await apiClient.get(`/audits/${auditId}`);
-    const techFindings = (audit.findings || []).filter(f => f.category === "TECHNICAL");
+    const techFindings = (audit.findings || []).filter(f => f.category === "TECHNICAL" || f.category === "CRAWLER");
     const techScore = audit.category_scores ? audit.category_scores.TECHNICAL : null;
     const scoreObj = getScoreDetails(techScore);
 
@@ -136,4 +136,3 @@ export async function loadTechnicalData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load technical findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

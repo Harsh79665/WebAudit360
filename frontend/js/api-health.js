@@ -17,12 +17,13 @@ export async function loadApiHealthData() {
 
   try {
     const health = await apiClient.get("/health").catch(() => ({ status: "HEALTHY", subsystems: {} }));
+    const subs = health.subsystems || {};
 
     let html = `
       <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
           <div class="text-xs text-muted" style="text-transform: uppercase;">Gateway API Status</div>
-          <div style="font-size: 2.25rem; font-weight: 800; margin: 4px 0; color: var(--accent-green);">
+          <div style="font-size: 2.25rem; font-weight: 800; margin: 4px 0; color: ${health.status === 'HEALTHY' ? 'var(--accent-green)' : 'var(--accent-warning)'};">
             ${escapeHtml(health.status || 'HEALTHY')}
           </div>
           <span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">FastAPI Monolith</span>
@@ -63,28 +64,28 @@ export async function loadApiHealthData() {
             <tbody>
               <tr>
                 <td><strong>Database Layer</strong></td>
-                <td>PostgreSQL / SQLAlchemy 2 (Local SQLite fallback)</td>
-                <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">ONLINE</span></td>
+                <td>${escapeHtml(subs.database?.engine || 'PostgreSQL / SQLite fallback')}</td>
+                <td><span class="badge ${subs.database?.status === 'ONLINE' ? 'score-good' : 'score-poor'}">${escapeHtml(subs.database?.status || 'ONLINE')}</span></td>
               </tr>
               <tr>
                 <td><strong>Browser Automation</strong></td>
-                <td>Playwright Headless Chromium</td>
-                <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">READY</span></td>
+                <td>${escapeHtml(subs.browser_engine?.engine || 'Playwright Headless Chromium')}</td>
+                <td><span class="badge score-good">${escapeHtml(subs.browser_engine?.status || 'READY')}</span></td>
               </tr>
               <tr>
                 <td><strong>Performance Lab Engine</strong></td>
-                <td>Lighthouse CLI v13.6.0</td>
-                <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">READY</span></td>
+                <td>${escapeHtml(subs.performance_engine?.engine || 'Lighthouse CLI 13.x')}</td>
+                <td><span class="badge score-good">${escapeHtml(subs.performance_engine?.status || 'READY')}</span></td>
               </tr>
               <tr>
                 <td><strong>Accessibility Engine</strong></td>
-                <td>axe-core v4.10.x</td>
-                <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">READY</span></td>
+                <td>${escapeHtml(subs.accessibility_engine?.engine || 'axe-core 4.10.x')}</td>
+                <td><span class="badge score-good">${escapeHtml(subs.accessibility_engine?.status || 'READY')}</span></td>
               </tr>
               <tr>
                 <td><strong>Security Probes</strong></td>
-                <td>Passive HTTP/TLS + Authorized OWASP ZAP</td>
-                <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">READY</span></td>
+                <td>${escapeHtml(subs.security_engine?.engine || 'Passive HTTP/TLS + Authorized OWASP ZAP')}</td>
+                <td><span class="badge score-good">${escapeHtml(subs.security_engine?.status || 'READY')}</span></td>
               </tr>
             </tbody>
           </table>
@@ -98,4 +99,3 @@ export async function loadApiHealthData() {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load API health telemetry: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

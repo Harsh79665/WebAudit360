@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -92,7 +92,7 @@ export async function loadStructureData(auditId) {
                 <th>Page URL</th>
                 <th>Crawl Depth</th>
                 <th>HTTP Status</th>
-                <th>Score</th>
+                <th>Response Time</th>
               </tr>
             </thead>
             <tbody>
@@ -104,8 +104,8 @@ export async function loadStructureData(auditId) {
                   </div>
                 </td>
                 <td><span class="badge">Depth 0 (Root)</span></td>
-                <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary);">200 OK</span></td>
-                <td>${audit.overall_score !== null ? Math.round(audit.overall_score) : 'N/A'}</td>
+                <td><span class="badge score-good">200 OK</span></td>
+                <td>${audit.execution_time_ms ? audit.execution_time_ms + 'ms' : '—'}</td>
               </tr>
             </tbody>
           </table>
@@ -120,12 +120,16 @@ export async function loadStructureData(auditId) {
                 <th>Page URL</th>
                 <th>Crawl Depth</th>
                 <th>HTTP Status</th>
-                <th>Page Score</th>
+                <th>Response Time</th>
+                <th>Content Type</th>
               </tr>
             </thead>
             <tbody>
       `;
       pages.forEach(p => {
+        const depth = p.crawl_depth !== undefined ? p.crawl_depth : (p.depth || 0);
+        const statusCode = p.status_code !== undefined ? p.status_code : (p.http_status || 200);
+        const statusBadgeClass = statusCode >= 200 && statusCode < 300 ? 'score-good' : (statusCode >= 400 ? 'score-poor' : 'score-warning');
         html += `
           <tr>
             <td>
@@ -134,9 +138,10 @@ export async function loadStructureData(auditId) {
                 <span style="font-weight:600;">${escapeHtml(p.url)}</span>
               </div>
             </td>
-            <td><span class="badge">Depth ${p.depth || 0}</span></td>
-            <td><span class="badge">${p.http_status || 200}</span></td>
-            <td>${p.page_score !== null && p.page_score !== undefined ? Math.round(p.page_score) : 'N/A'}</td>
+            <td><span class="badge">Depth ${depth}</span></td>
+            <td><span class="badge ${statusBadgeClass}">${statusCode}</span></td>
+            <td>${p.response_time_ms ? p.response_time_ms + 'ms' : '—'}</td>
+            <td><code>${escapeHtml(p.content_type || 'text/html')}</code></td>
           </tr>
         `;
       });
@@ -147,7 +152,6 @@ export async function loadStructureData(auditId) {
     container.innerHTML = html;
     renderIcons(container);
   } catch (err) {
-    container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load website structure: ${escapeHtml(err.message)}</p></div>`;
+    container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load structure explorer: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

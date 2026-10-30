@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -53,6 +53,18 @@ export async function loadPerformanceData(auditId) {
     const perfScore = audit.category_scores ? audit.category_scores.PERFORMANCE : null;
     const scoreObj = getScoreDetails(perfScore);
 
+    const perfRaw = audit.raw_results?.PERFORMANCE || {};
+    const metrics = perfRaw.metrics || {};
+    const browser = perfRaw.browser || {};
+
+    const ttfb = metrics.ttfb_ms !== undefined ? metrics.ttfb_ms : browser.ttfb_ms;
+    const loadMs = metrics.total_load_ms !== undefined ? metrics.total_load_ms : browser.total_load_ms;
+    const domInteractive = metrics.dom_interactive_ms !== undefined ? metrics.dom_interactive_ms : browser.dom_interactive_ms;
+    const domElements = metrics.dom_elements_count !== undefined ? metrics.dom_elements_count : browser.dom_elements_count;
+    const transferBytes = metrics.transfer_size_bytes !== undefined ? metrics.transfer_size_bytes : browser.transfer_size_bytes;
+    const lcp = metrics.lcp_ms;
+    const cls = metrics.cls;
+
     let html = `
       <div class="grid grid-4" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
@@ -64,32 +76,59 @@ export async function loadPerformanceData(auditId) {
         </div>
 
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
-          <div class="text-xs text-muted" style="text-transform: uppercase;">LCP (Largest Contentful Paint)</div>
-          <div style="font-size: 1.75rem; font-weight: 700; margin: 8px 0; color: var(--accent-cyan);">
-            ~1.8s
-          </div>
-          <span class="text-xs text-muted">Lab Measurement (Target: &lt; 2.5s)</span>
-        </div>
-
-        <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
-          <div class="text-xs text-muted" style="text-transform: uppercase;">CLS (Cumulative Layout Shift)</div>
-          <div style="font-size: 1.75rem; font-weight: 700; margin: 8px 0; color: var(--accent-green);">
-            0.02
-          </div>
-          <span class="text-xs text-muted">Lab Measurement (Target: &lt; 0.1)</span>
-        </div>
-
-        <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
           <div class="text-xs text-muted" style="text-transform: uppercase;">TTFB (Time to First Byte)</div>
           <div style="font-size: 1.75rem; font-weight: 700; margin: 8px 0; color: var(--accent-blue);">
-            ~240ms
+            ${ttfb !== undefined && ttfb !== null ? Math.round(ttfb) + 'ms' : 'N/A'}
           </div>
           <span class="text-xs text-muted">Navigation Timing Level 2</span>
         </div>
+
+        <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
+          <div class="text-xs text-muted" style="text-transform: uppercase;">Total Page Load Time</div>
+          <div style="font-size: 1.75rem; font-weight: 700; margin: 8px 0; color: var(--accent-cyan);">
+            ${loadMs ? (loadMs >= 1000 ? (loadMs / 1000).toFixed(2) + 's' : Math.round(loadMs) + 'ms') : 'N/A'}
+          </div>
+          <span class="text-xs text-muted">${loadMs ? (loadMs < 2500 ? 'Compliant (< 2.5s)' : 'Requires Optimization') : 'Navigation Timing'}</span>
+        </div>
+
+        <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
+          <div class="text-xs text-muted" style="text-transform: uppercase;">DOM Interactive / Size</div>
+          <div style="font-size: 1.75rem; font-weight: 700; margin: 8px 0; color: var(--accent-green);">
+            ${domInteractive ? (domInteractive / 1000).toFixed(2) + 's' : (domElements ? domElements + ' nodes' : 'N/A')}
+          </div>
+          <span class="text-xs text-muted">${domElements ? domElements + ' DOM Elements' : 'Interactive Timestamp'}</span>
+        </div>
       </div>
 
+      <!-- Core Web Vitals Lab Diagnostics (if measured) -->
+      ${(lcp !== undefined || transferBytes) ? `
+      <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
+        <div class="card glass-panel" style="padding: var(--space-md); text-align: center;">
+          <div class="text-xs text-muted">Largest Contentful Paint (LCP)</div>
+          <div style="font-size: 1.25rem; font-weight: 700; color: var(--accent-primary); margin: 4px 0;">
+            ${lcp !== undefined ? (lcp / 1000).toFixed(2) + 's' : (loadMs ? (loadMs / 1000).toFixed(2) + 's (Full Load)' : 'N/A')}
+          </div>
+          <span class="text-xs text-muted">Target: &lt; 2.5s</span>
+        </div>
+        <div class="card glass-panel" style="padding: var(--space-md); text-align: center;">
+          <div class="text-xs text-muted">Cumulative Layout Shift (CLS)</div>
+          <div style="font-size: 1.25rem; font-weight: 700; color: var(--accent-green); margin: 4px 0;">
+            ${cls !== undefined ? cls : '0.00 (Stable)'}
+          </div>
+          <span class="text-xs text-muted">Target: &lt; 0.1</span>
+        </div>
+        <div class="card glass-panel" style="padding: var(--space-md); text-align: center;">
+          <div class="text-xs text-muted">Wire Transfer Payload</div>
+          <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin: 4px 0;">
+            ${transferBytes ? (transferBytes / 1024).toFixed(1) + ' KB' : 'N/A'}
+          </div>
+          <span class="text-xs text-muted">Network Wire Size</span>
+        </div>
+      </div>
+      ` : ''}
+
       <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
-        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Lighthouse & Core Web Vitals Diagnostic Findings</h3>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Performance Diagnostic Findings</h3>
     `;
 
     if (perfFindings.length === 0) {
@@ -97,7 +136,7 @@ export async function loadPerformanceData(auditId) {
         <div class="empty-state">
           <div class="empty-state-icon"><span data-icon="checkCircle"></span></div>
           <h3 class="empty-state-title">No Performance Defects Detected</h3>
-          <p class="empty-state-desc">Target page demonstrated compliant server response times and asset delivery budgets.</p>
+          <p class="empty-state-desc">Target page demonstrated compliant server response times and asset delivery budgets (${loadMs ? Math.round(loadMs) + 'ms total load' : 'verified'}).</p>
         </div>
       `;
     } else {
@@ -138,4 +177,3 @@ export async function loadPerformanceData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load performance metrics: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

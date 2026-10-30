@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -50,6 +50,14 @@ export async function loadSEOData(auditId) {
     const seoScore = audit.category_scores ? audit.category_scores.SEO : null;
     const scoreObj = getScoreDetails(seoScore);
 
+    const seoRaw = audit.raw_results?.SEO || {};
+    const title = seoRaw.title || "Not Specified";
+    const desc = seoRaw.meta_description || "Not Specified";
+    const h1Count = seoRaw.h1_count !== undefined ? seoRaw.h1_count : null;
+    const canonical = seoRaw.canonical_url || "Not Specified";
+    const imagesTotal = seoRaw.images_total !== undefined ? seoRaw.images_total : null;
+    const imagesMissingAlt = seoRaw.images_missing_alt !== undefined ? seoRaw.images_missing_alt : null;
+
     let html = `
       <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
@@ -71,9 +79,41 @@ export async function loadSEOData(auditId) {
         <div class="card glass-panel" style="padding: var(--space-lg);">
           <div class="text-xs text-muted" style="text-transform: uppercase; margin-bottom: 6px;">SEO Checks Summary</div>
           <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-primary);">
-            ${seoFindings.length} SEO Diagnostics Flagged
+            ${seoFindings.length} Diagnostic Note(s)
           </div>
-          <div class="text-xs text-muted" style="margin-top: 6px;">Headings, Meta, Canonicals, Open Graph</div>
+          <div class="text-xs text-muted" style="margin-top: 6px;">
+            H1: <strong>${h1Count !== null ? h1Count : 'Checked'}</strong> &bull; Images: <strong>${imagesTotal !== null ? imagesTotal : 'Checked'}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real Extracted Metadata Inspection Card -->
+      <div class="glass-panel" style="padding: var(--space-lg); margin-bottom: var(--space-xl);">
+        <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-md); color: var(--text-primary);">
+          <span data-icon="search"></span> Extracted Search Engine Snippet Preview
+        </h4>
+        <div style="background: var(--bg-surface); padding: var(--space-md); border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: var(--space-md);">
+          <div style="color: var(--accent-blue); font-size: 1.1rem; font-weight: 600; margin-bottom: 2px;">
+            ${escapeHtml(title)}
+          </div>
+          <div style="color: var(--accent-green); font-size: 0.8rem; margin-bottom: 4px; word-break: break-all;">
+            ${escapeHtml(canonical !== 'Not Specified' ? canonical : audit.target_url)}
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0; line-height: 1.5;">
+            ${escapeHtml(desc)}
+          </p>
+        </div>
+
+        <div class="grid grid-3 text-xs" style="gap: var(--space-md);">
+          <div>
+            <strong>Title Length:</strong> ${title !== 'Not Specified' ? `${title.length} characters` : 'Missing'}
+          </div>
+          <div>
+            <strong>Meta Description Length:</strong> ${desc !== 'Not Specified' ? `${desc.length} characters` : 'Missing'}
+          </div>
+          <div>
+            <strong>Image Alt Coverage:</strong> ${imagesTotal !== null ? `${imagesTotal - (imagesMissingAlt || 0)} / ${imagesTotal} tagged` : 'Audited'}
+          </div>
         </div>
       </div>
 
@@ -132,4 +172,3 @@ export async function loadSEOData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load SEO findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

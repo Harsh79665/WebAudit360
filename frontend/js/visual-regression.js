@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -100,4 +100,3 @@ export async function loadVisualData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load visual data: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

@@ -7,7 +7,7 @@
  */
 
 import { apiClient } from "./api.js";
-import { escapeHtml, formatDate, getScoreDetails } from "./utils.js";
+import { escapeHtml, formatDate } from "./utils.js";
 import { renderIcons } from "./icons.js";
 
 export async function initTechnologyView() {
@@ -25,7 +25,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -49,14 +49,18 @@ export async function loadTechnologyData(auditId) {
 
   try {
     const audit = await apiClient.get(`/audits/${auditId}`);
+    const techRaw = audit.raw_results?.TECHNOLOGY || {};
+    const rawTechs = techRaw.technologies || [];
     const techFindings = (audit.findings || []).filter(f => f.category === "TECHNOLOGY");
+
+    const totalCount = Math.max(rawTechs.length, techFindings.length);
 
     let html = `
       <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
           <div class="text-xs text-muted" style="text-transform: uppercase;">Detected Components</div>
           <div style="font-size: 2.25rem; font-weight: 800; margin: 4px 0; color: var(--accent-primary);">
-            ${techFindings.length}
+            ${totalCount}
           </div>
           <span class="badge">Evidence Verified</span>
         </div>
@@ -86,7 +90,7 @@ export async function loadTechnologyData(auditId) {
         <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Identified Technology Stack</h3>
     `;
 
-    if (techFindings.length === 0) {
+    if (totalCount === 0) {
       html += `
         <div class="empty-state">
           <div class="empty-state-icon"><span data-icon="cpu"></span></div>
@@ -101,32 +105,61 @@ export async function loadTechnologyData(auditId) {
             <thead>
               <tr>
                 <th>Technology</th>
+                <th>Category</th>
                 <th>Confidence</th>
                 <th>Observed Signature Evidence</th>
               </tr>
             </thead>
             <tbody>
       `;
-      techFindings.forEach(f => {
-        html += `
-          <tr>
-            <td>
-              <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">${escapeHtml(f.title.replace('Detected: ', ''))}</div>
-              <div class="text-xs text-muted">ID: ${escapeHtml(f.rule_id || '')}</div>
-            </td>
-            <td>
-              <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">
-                ${f.confidence ? Math.round(f.confidence * 100) : 95}% Confidence
-              </span>
-            </td>
-            <td>
-              <code style="font-size: 0.75rem; background: var(--bg-surface); padding: 4px 8px; border-radius: 4px; display: block; max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                ${escapeHtml(f.evidence_snippet || f.description || 'Verified via DOM/Script')}
-              </code>
-            </td>
-          </tr>
-        `;
-      });
+
+      if (rawTechs.length > 0) {
+        rawTechs.forEach(t => {
+          html += `
+            <tr>
+              <td>
+                <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">${escapeHtml(t.name)}</div>
+              </td>
+              <td>
+                <span class="badge">${escapeHtml(t.category || 'Framework / Library')}</span>
+              </td>
+              <td>
+                <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">
+                  ${t.confidence ? Math.round(t.confidence * 100) : 95}% Confidence
+                </span>
+              </td>
+              <td>
+                <code style="font-size: 0.75rem; background: var(--bg-surface); padding: 4px 8px; border-radius: 4px; display: block; max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${escapeHtml(t.evidence || 'Verified via DOM/Script')}
+                </code>
+              </td>
+            </tr>
+          `;
+        });
+      } else {
+        techFindings.forEach(f => {
+          html += `
+            <tr>
+              <td>
+                <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">${escapeHtml(f.title.replace('Detected: ', ''))}</div>
+                <div class="text-xs text-muted">ID: ${escapeHtml(f.rule_id || '')}</div>
+              </td>
+              <td><span class="badge">Component</span></td>
+              <td>
+                <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">
+                  ${f.confidence ? Math.round(f.confidence * 100) : 95}% Confidence
+                </span>
+              </td>
+              <td>
+                <code style="font-size: 0.75rem; background: var(--bg-surface); padding: 4px 8px; border-radius: 4px; display: block; max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${escapeHtml(f.evidence_snippet || f.description || 'Verified via DOM/Script')}
+                </code>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
       html += `</tbody></table></div>`;
     }
 
@@ -137,4 +170,3 @@ export async function loadTechnologyData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load technology stack: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

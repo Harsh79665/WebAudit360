@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -49,8 +49,18 @@ export async function loadSecurityData(auditId) {
     const secFindings = (audit.findings || []).filter(f => 
       f.category === "SECURITY_PASSIVE" || f.category === "SECURITY_ACTIVE"
     );
-    const secScore = audit.category_scores ? audit.category_scores.SECURITY_PASSIVE : null;
+    const secScore = audit.category_scores ? (audit.category_scores.SECURITY_PASSIVE ?? audit.category_scores.SECURITY) : null;
     const scoreObj = getScoreDetails(secScore);
+
+    const secRaw = audit.raw_results?.SECURITY_PASSIVE || {};
+    const headers = secRaw.headers || {};
+    const isHttps = secRaw.is_https !== undefined ? secRaw.is_https : audit.target_url.startsWith("https://");
+
+    const hasHsts = !!headers["strict-transport-security"];
+    const hasCsp = !!headers["content-security-policy"];
+    const hasXfo = !!headers["x-frame-options"];
+    const hasXcto = !!headers["x-content-type-options"];
+    const hasRefPol = !!headers["referrer-policy"];
 
     let html = `
       <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
@@ -63,12 +73,12 @@ export async function loadSecurityData(auditId) {
         </div>
 
         <div class="card glass-panel" style="padding: var(--space-lg);">
-          <div class="text-xs text-muted" style="text-transform: uppercase; margin-bottom: 6px;">Passive Headers Audit</div>
-          <div style="font-weight: 700; font-size: 1.05rem; color: var(--accent-primary);">
-            RFC & OWASP Recommended Headers
+          <div class="text-xs text-muted" style="text-transform: uppercase; margin-bottom: 6px;">Transport & Headers</div>
+          <div style="font-weight: 700; font-size: 1.05rem; color: ${isHttps ? 'var(--accent-green)' : 'var(--accent-danger)'};">
+            ${isHttps ? 'TLS Encrypted (HTTPS)' : 'Insecure Plaintext (HTTP)'}
           </div>
           <p class="text-xs text-muted" style="margin-top: 6px;">
-            HSTS, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.
+            HSTS: ${hasHsts ? 'Enforced' : 'Missing'} &bull; CSP: ${hasCsp ? 'Configured' : 'Missing'}
           </p>
         </div>
 
@@ -78,8 +88,41 @@ export async function loadSecurityData(auditId) {
             Cryptographic Authorization Required
           </div>
           <p class="text-xs text-muted" style="margin-top: 6px;">
-            Active non-destructive probing requires a verified DNS TXT or HTTP well-known token challenge.
+            Active non-destructive probing requires a verified DNS TXT or HTTP token challenge.
           </p>
+        </div>
+      </div>
+
+      <!-- Real Response Headers Matrix -->
+      <div class="glass-panel" style="padding: var(--space-lg); margin-bottom: var(--space-xl);">
+        <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-md); color: var(--text-primary);">
+          <span data-icon="shield"></span> Defensive HTTP Headers Evaluation
+        </h4>
+        <div class="grid grid-3 text-xs" style="gap: var(--space-md);">
+          <div class="card glass-panel" style="padding: var(--space-md);">
+            <div style="font-weight: 700; margin-bottom: 4px;">Strict-Transport-Security (HSTS)</div>
+            <span class="badge ${hasHsts ? 'score-good' : 'score-poor'}">${hasHsts ? 'Present' : 'Missing'}</span>
+          </div>
+          <div class="card glass-panel" style="padding: var(--space-md);">
+            <div style="font-weight: 700; margin-bottom: 4px;">Content-Security-Policy (CSP)</div>
+            <span class="badge ${hasCsp ? 'score-good' : 'score-poor'}">${hasCsp ? 'Present' : 'Missing'}</span>
+          </div>
+          <div class="card glass-panel" style="padding: var(--space-md);">
+            <div style="font-weight: 700; margin-bottom: 4px;">X-Frame-Options (Clickjacking)</div>
+            <span class="badge ${hasXfo ? 'score-good' : 'score-warning'}">${hasXfo ? 'Present' : 'Missing'}</span>
+          </div>
+          <div class="card glass-panel" style="padding: var(--space-md);">
+            <div style="font-weight: 700; margin-bottom: 4px;">X-Content-Type-Options</div>
+            <span class="badge ${hasXcto ? 'score-good' : 'score-warning'}">${hasXcto ? 'Present' : 'Missing'}</span>
+          </div>
+          <div class="card glass-panel" style="padding: var(--space-md);">
+            <div style="font-weight: 700; margin-bottom: 4px;">Referrer-Policy</div>
+            <span class="badge ${hasRefPol ? 'score-good' : 'score-warning'}">${hasRefPol ? 'Present' : 'Missing'}</span>
+          </div>
+          <div class="card glass-panel" style="padding: var(--space-md);">
+            <div style="font-weight: 700; margin-bottom: 4px;">Transport Security</div>
+            <span class="badge ${isHttps ? 'score-good' : 'score-critical'}">${isHttps ? 'HTTPS / TLS' : 'Insecure HTTP'}</span>
+          </div>
         </div>
       </div>
 
@@ -148,10 +191,8 @@ window.requestDomainAuth = async function(targetUrl) {
   try {
     const parsed = new URL(decodeURIComponent(targetUrl));
     const domain = parsed.hostname;
-    // Look up or create project
     showToast(`Domain verification challenge requested for ${domain}. Check your Project dashboard.`, "info");
   } catch (e) {
     showToast("Invalid domain URL", "error");
   }
 };
-

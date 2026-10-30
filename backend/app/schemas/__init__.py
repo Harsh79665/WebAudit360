@@ -191,6 +191,28 @@ class FindingListResponse(BaseModel):
     total: int
 
 
+class AuditPageResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    audit_id: int
+    url: str
+    path: str
+    status_code: Optional[int] = None
+    crawl_depth: int = 0
+    response_time_ms: Optional[int] = None
+    content_type: Optional[str] = None
+    is_orphan: bool = False
+    created_at: datetime
+
+
+class AuditDetailResponse(AuditResponse):
+    raw_results: Dict[str, Any] = Field(default_factory=dict)
+    findings: List[FindingResponse] = Field(default_factory=list)
+    pages: List[AuditPageResponse] = Field(default_factory=list)
+    category_scores: Dict[str, Optional[float]] = Field(default_factory=dict)
+
+
 class FindingStatusUpdate(BaseModel):
     status: FindingStatus
     reason: Optional[str] = None

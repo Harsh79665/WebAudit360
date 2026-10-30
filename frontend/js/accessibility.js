@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -90,7 +90,7 @@ export async function loadAccessibilityData(auditId) {
         <div class="empty-state">
           <div class="empty-state-icon"><span data-icon="checkCircle"></span></div>
           <h3 class="empty-state-title">No Automated Accessibility Violations Detected</h3>
-          <p class="empty-state-desc">The page passed all automated axe-core test criteria.</p>
+          <p class="empty-state-desc">The page passed all automated axe-core test criteria without critical contrast, labeling, or structural violations.</p>
         </div>
       `;
     } else {
@@ -136,4 +136,3 @@ export async function loadAccessibilityData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load accessibility findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

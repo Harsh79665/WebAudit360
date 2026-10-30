@@ -6,6 +6,7 @@ import asyncio
 from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.database import AsyncSessionLocal, get_db
@@ -14,7 +15,9 @@ from backend.app.core.ssrf import validate_target_url, SSRFValidationError
 from backend.app.models.entities import Audit, AuditFinding, AuditPage, AuditStatus, User
 from backend.app.schemas import (
     AuditCreate,
+    AuditDetailResponse,
     AuditListResponse,
+    AuditPageResponse,
     AuditResponse,
     FindingListResponse,
     FindingResponse,
@@ -105,14 +108,37 @@ async def list_audits(
     )
 
 
-@router.get("/{audit_id}", response_model=AuditResponse)
+@router.get("/{audit_id}", response_model=AuditDetailResponse)
 async def get_audit(audit_id: int, session: AsyncSession = Depends(get_db)):
-    """Retrieves full details and calculated scores of an audit run."""
-    result = await session.execute(select(Audit).where(Audit.id == audit_id))
+    """Retrieves full details, findings, pages, and calculated scores of an audit run."""
+    result = await session.execute(
+        select(Audit)
+        .options(selectinload(Audit.pages), selectinload(Audit.findings))
+        .where(Audit.id == audit_id)
+    )
     audit = result.scalars().first()
     if not audit:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Audit not found.")
-    return AuditResponse.model_validate(audit)
+
+    findings_list = audit.findings or []
+    category_scores = {
+        "PERFORMANCE": audit.score_performance,
+        "SEO": audit.score_seo,
+        "ACCESSIBILITY": audit.score_accessibility,
+        "SECURITY": audit.score_security,
+        "SECURITY_PASSIVE": audit.score_security,
+        "TECHNICAL": audit.score_technical,
+        "DOMAIN": 100.0 if not any(f.category == "DOMAIN" and f.severity.value in ("HIGH", "CRITICAL") for f in findings_list) else 70.0,
+        "RESPONSIVE": 100.0 if not any(f.category == "RESPONSIVE" and f.severity.value in ("HIGH", "CRITICAL") for f in findings_list) else 75.0,
+    }
+
+    return AuditDetailResponse(
+        **AuditResponse.model_validate(audit).model_dump(),
+        raw_results=audit.raw_results or {},
+        findings=[FindingResponse.model_validate(f) for f in findings_list],
+        pages=[AuditPageResponse.model_validate(p) for p in (audit.pages or [])],
+        category_scores=category_scores
+    )
 
 
 @router.post("/{audit_id}/cancel", response_model=StatusResponse)

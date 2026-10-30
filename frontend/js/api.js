@@ -46,9 +46,7 @@ export const apiClient = {
           response = await fetch(url, { ...options, headers });
         } else {
           this.clearTokens();
-          if (!window.location.pathname.endsWith("login.html") && !window.location.pathname.endsWith("index.html")) {
-            window.location.href = "login.html";
-          }
+          // Transparent open-access without mandatory login redirects
         }
       }
 

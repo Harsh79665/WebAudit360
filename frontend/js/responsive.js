@@ -22,7 +22,7 @@ async function populateAuditSelector() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
@@ -50,6 +50,9 @@ export async function loadResponsiveData(auditId) {
     const respScore = audit.category_scores ? audit.category_scores.RESPONSIVE : null;
     const scoreObj = getScoreDetails(respScore);
 
+    const respRaw = audit.raw_results?.RESPONSIVE || {};
+    const viewports = respRaw.viewports || {};
+
     let html = `
       <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
@@ -71,15 +74,45 @@ export async function loadResponsiveData(auditId) {
         </div>
 
         <div class="card glass-panel" style="padding: var(--space-lg);">
-          <div class="text-xs text-muted" style="text-transform: uppercase; margin-bottom: 6px;">Emulation Disclaimer</div>
-          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary);">
-            Emulated Browser Session
+          <div class="text-xs text-muted" style="text-transform: uppercase; margin-bottom: 6px;">Emulation Standard</div>
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--accent-green);">
+            Playwright Headless Browser
           </div>
           <p class="text-xs text-muted" style="margin-top: 6px;">
-            Viewport emulation simulates layout dimensions, not physical GPU hardware acceleration.
+            Direct DOM scrollWidth vs. clientWidth boundary verification per viewport.
           </p>
         </div>
       </div>
+
+      <!-- Real Viewport Test Results Matrix -->
+      ${Object.keys(viewports).length > 0 ? `
+      <div class="glass-panel" style="padding: var(--space-lg); margin-bottom: var(--space-xl);">
+        <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-md); color: var(--text-primary);">
+          <span data-icon="layout"></span> Viewport Layout & Boundary Analysis
+        </h4>
+        <div class="grid grid-3" style="gap: var(--space-md);">
+          ${Object.entries(viewports).map(([name, data]) => `
+            <div class="card glass-panel" style="padding: var(--space-md);">
+              <div class="flex items-center justify-between" style="margin-bottom: 6px;">
+                <strong>${escapeHtml(name)} Viewport</strong>
+                <span class="badge ${data.has_overflow ? 'score-poor' : 'score-good'}">
+                  ${data.has_overflow ? 'Overflow Detected' : 'No Overflow'}
+                </span>
+              </div>
+              <div class="text-xs" style="line-height: 1.6; color: var(--text-secondary);">
+                <div>Horizontal Overflow: <strong>${data.overflow_pixels || 0}px</strong></div>
+                ${data.small_touch_targets_count !== undefined ? `
+                  <div>Undersized Touch Targets: <strong>${data.small_touch_targets_count}</strong></div>
+                ` : ''}
+                ${data.viewport_meta ? `
+                  <div>Meta Tag: <code>${escapeHtml(data.viewport_meta)}</code></div>
+                ` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
 
       <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
         <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Responsive & Viewport Diagnostics</h3>
@@ -90,7 +123,7 @@ export async function loadResponsiveData(auditId) {
         <div class="empty-state">
           <div class="empty-state-icon"><span data-icon="smartphone"></span></div>
           <h3 class="empty-state-title">No Horizontal Overflow or Layout Clipping</h3>
-          <p class="empty-state-desc">The target page renders within boundary constraints across all tested viewports.</p>
+          <p class="empty-state-desc">The target page renders cleanly within boundary constraints across all tested mobile and desktop viewports.</p>
         </div>
       `;
     } else {
@@ -136,4 +169,3 @@ export async function loadResponsiveData(auditId) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to load responsive findings: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

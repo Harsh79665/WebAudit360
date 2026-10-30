@@ -23,11 +23,11 @@ async function populateComparisonSelectors() {
 
   try {
     const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = data.items || [];
+    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
 
     if (audits.length < 2) {
-      selectA.innerHTML = `<option value="">Need at least 2 audits to compare</option>`;
-      selectB.innerHTML = `<option value="">Need at least 2 audits to compare</option>`;
+      selectA.innerHTML = `<option value="">Need at least 2 real audits to compare</option>`;
+      selectB.innerHTML = `<option value="">Need at least 2 real audits to compare</option>`;
       return;
     }
 
@@ -162,4 +162,3 @@ export async function executeComparison(idA, idB) {
     container.innerHTML = `<div class="empty-state"><p class="text-danger">Failed to execute comparison: ${escapeHtml(err.message)}</p></div>`;
   }
 }
-

@@ -4,12 +4,12 @@ Author: Harsh Patel
 
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.core.config import settings
-from backend.app.core.database import init_db
+from backend.app.core.database import get_db, init_db
 from backend.app.core.logging import logger
 from backend.app.api.v1.router import api_router
 from backend.app.api.v1.endpoints import websockets, health
@@ -52,7 +52,11 @@ def create_app() -> FastAPI:
     # Include API Routers
     app.include_router(api_router)
     app.include_router(websockets.router, prefix="/api/v1")
-    app.include_router(health.router)
+
+    # Root health endpoint alias
+    @app.get("/health", tags=["Health & Diagnostics"], include_in_schema=False)
+    async def root_health(session=Depends(get_db)):
+        return await health.get_system_health(session)
 
     # Mount Frontend Static Assets
     frontend_dir = os.path.join(

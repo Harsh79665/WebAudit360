@@ -11,11 +11,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.config import settings
 from backend.app.core.database import get_db
 
-router = APIRouter(tags=["Health & Diagnostics"])
+router = APIRouter(prefix="/health", tags=["Health & Diagnostics"])
 
 
-@router.get("/health")
-@router.get("/api/v1/health")
+@router.get("", summary="Get system health diagnostics")
 async def get_system_health(session: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """
     Returns live system diagnostics, database connectivity, and engine subsystem availability.

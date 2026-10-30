@@ -25,3 +25,4 @@ api_router.include_router(reports.router)
 api_router.include_router(monitoring.router)
 api_router.include_router(authorizations.router)
 api_router.include_router(health.router)
+

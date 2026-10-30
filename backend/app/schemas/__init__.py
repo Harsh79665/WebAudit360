@@ -216,3 +216,4 @@ class ScheduleResponse(BaseModel):
     next_run_at: Optional[datetime] = None
     alert_on_regression: bool
     created_at: datetime
+

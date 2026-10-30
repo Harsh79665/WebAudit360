@@ -101,3 +101,4 @@ def calculate_overall_score(
     }
 
     return overall_score, metadata
+

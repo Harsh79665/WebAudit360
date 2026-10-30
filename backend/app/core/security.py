@@ -53,3 +53,4 @@ def create_refresh_token(data: Dict[str, Any], expires_delta: Optional[timedelta
 def decode_token(token: str) -> Dict[str, Any]:
     """Decodes and validates a JWT token."""
     return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+

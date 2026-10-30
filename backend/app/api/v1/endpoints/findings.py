@@ -107,3 +107,4 @@ async def retest_finding(finding_id: int, session: AsyncSession = Depends(get_db
         success=True,
         message=f"Retest queued for rule '{finding.rule_id}'. Issue will be marked resolved only if verification succeeds."
     )
+

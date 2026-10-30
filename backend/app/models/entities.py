@@ -265,3 +265,4 @@ class Webhook(Base):
     events = Column(JSON, default=list, nullable=False)  # e.g. ["audit.completed", "regression.detected"]
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+

@@ -206,3 +206,4 @@ class PerformanceEngine(BaseAuditEngine):
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
         return None
+

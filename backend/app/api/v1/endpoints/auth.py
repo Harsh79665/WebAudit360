@@ -129,3 +129,4 @@ async def logout_user():
 async def get_current_user_profile(user: User = Depends(get_current_user)):
     """Returns the authenticated user's profile."""
     return UserResponse.model_validate(user)
+

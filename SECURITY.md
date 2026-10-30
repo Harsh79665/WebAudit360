@@ -58,3 +58,4 @@ WebAudit 360 enforces an uncompromising outbound network policy:
 * **Triage & Validation:** Within 72 hours.
 * **Remediation & Patch Deployment:** Critical issues are prioritized for emergency patch deployment within 5 business days; high and medium issues within 14 business days.
 * **Public Attribution:** Security researchers who report valid vulnerabilities following responsible disclosure guidelines will be credited in our release notes.
+

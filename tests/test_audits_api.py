@@ -67,3 +67,4 @@ async def test_health_check_endpoint():
         assert data["status"] in ("HEALTHY", "DEGRADED")
         assert data["platform"] == "WebAudit 360"
         assert data["creator"] == "Harsh Patel"
+

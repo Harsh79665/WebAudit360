@@ -88,3 +88,4 @@ async def delete_project(
     await session.delete(project)
     await session.commit()
     return StatusResponse(success=True, message="Project deleted successfully.")
+

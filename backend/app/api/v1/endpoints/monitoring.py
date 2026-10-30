@@ -64,3 +64,4 @@ async def delete_monitoring_schedule(
     await session.delete(schedule)
     await session.commit()
     return StatusResponse(success=True, message="Schedule deleted successfully.")
+

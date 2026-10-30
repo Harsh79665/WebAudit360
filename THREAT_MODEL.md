@@ -127,3 +127,4 @@ WebAudit 360 inspects websites without compromising sensitive user data:
 
 1. **Denial of Service via Heavy DOMs:** Extremely large or recursive DOM structures can strain headless browser memory. Safeguard: Chromium processes are launched with hard limits (`--js-flags="--max-old-space-size=512"`) and strict per-page execution timeouts (30 seconds).
 2. **Third-Party CDN Dynamic Behavior:** Changes in third-party scripts between runs can introduce slight measurement noise. Safeguard: All metrics display confidence intervals and sample size indicators.
+

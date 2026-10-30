@@ -114,3 +114,4 @@ async def get_domain_authorization(auth_id: int, session: AsyncSession = Depends
     if not auth_rec:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Authorization record not found.")
     return DomainAuthResponse.model_validate(auth_rec)
+

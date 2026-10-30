@@ -76,3 +76,4 @@ class BaseAuditEngine(ABC):
         Must return a structured EngineResult instance.
         """
         pass
+

@@ -64,3 +64,4 @@ def test_userinfo_rejection():
     """Userinfo inside URLs (user:pass@host) must be rejected to prevent credential leaks."""
     with pytest.raises(SSRFValidationError):
         validate_target_url("http://admin:secret@example.com")
+

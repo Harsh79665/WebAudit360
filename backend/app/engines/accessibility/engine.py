@@ -160,3 +160,4 @@ class AccessibilityEngine(BaseAuditEngine):
             limitations=limitations,
             execution_time_ms=execution_time_ms
         )
+

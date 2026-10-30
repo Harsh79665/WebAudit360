@@ -25,3 +25,4 @@ def execute_audit_job(self, audit_id: int):
     except Exception as exc:
         logger.error(f"[Celery Worker] Audit job #{audit_id} failed: {exc}")
         raise self.retry(exc=exc, countdown=10)
+

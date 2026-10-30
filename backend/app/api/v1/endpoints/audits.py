@@ -152,3 +152,4 @@ async def get_audit_findings(
         items=[FindingResponse.model_validate(f) for f in findings],
         total=len(findings)
     )
+

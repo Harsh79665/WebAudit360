@@ -67,3 +67,4 @@ def test_score_rating_labels():
     assert get_score_label(35.0) == "Poor"
     assert get_score_label(15.0) == "Critical"
     assert get_score_label(None) == "N/A"
+

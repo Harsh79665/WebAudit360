@@ -125,3 +125,4 @@ async def get_audit_report_pdf(audit_id: int, session: AsyncSession = Depends(ge
 """
 
     return HTMLResponse(content=html_content)
+

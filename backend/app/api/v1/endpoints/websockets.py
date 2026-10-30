@@ -61,3 +61,4 @@ async def audit_progress_websocket(websocket: WebSocket, audit_id: int):
             await websocket.close()
         except Exception:
             pass
+

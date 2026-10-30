@@ -48,3 +48,4 @@ export function renderIcons(root = document) {
     el.innerHTML = getIcon(iconName, className);
   });
 }
+

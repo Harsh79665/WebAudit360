@@ -38,3 +38,4 @@ export function applyTheme(theme) {
     darkOptions.forEach((el) => el.classList.remove("active"));
   }
 }
+

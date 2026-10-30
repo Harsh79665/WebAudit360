@@ -286,3 +286,4 @@ To ensure a seamless future Flutter Android/iOS application:
 3. **Optimized Mobile Schemas:** Mobile clients can request lightweight summary endpoints (`/api/v1/audits?summary=true`) to conserve bandwidth and battery life.
 4. **Offline SQLite Schema Alignment:** Mobile models mirror server Pydantic schemas, facilitating local caching with Flutter Drift/SQLite.
 5. **No Local Browser Scanning in Mobile:** The mobile app acts exclusively as a client for initiating audits and visualizing intelligence. Heavy browser execution, Lighthouse calculations, and OWASP ZAP testing remain 100% on the server fleet.
+

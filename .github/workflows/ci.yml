@@ -106,3 +106,4 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: webaudit360:latest
+

@@ -101,3 +101,4 @@ volumes:
 networks:
   webaudit_network:
     driver: bridge
+

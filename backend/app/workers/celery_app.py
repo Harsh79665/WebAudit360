@@ -24,3 +24,4 @@ celery_app.conf.update(
     worker_concurrency=4,
     worker_prefetch_multiplier=1,
 )
+

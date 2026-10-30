@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Technical Health — WebAudit 360</title>
+  <title>Technical Health Intelligence — WebAudit 360</title>
   
   <script>
     (function() {
@@ -26,68 +26,136 @@
 </head>
 <body>
 
+  <!-- Navbar -->
   <header class="navbar">
     <div class="container-fluid navbar-inner">
       <div class="flex items-center gap-md">
-        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle navigation menu">
+          <span data-icon="menu"></span>
+        </button>
         <a href="dashboard.html" class="nav-brand">
           <span data-icon="globe" data-icon-class="gradient-text"></span>
           <span>WebAudit <span class="gradient-text">360</span></span>
         </a>
       </div>
+
       <div class="nav-actions">
-        <div class="theme-toggle-capsule" role="button" tabindex="0">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle theme">
           <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
           <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
         </div>
-        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+        <a href="new-audit.html" class="btn btn-primary btn-sm">
+          <span data-icon="zap"></span>
+          <span>New Audit</span>
+        </a>
       </div>
     </div>
   </header>
 
+  <!-- Slide Navigation -->
   <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
-  <aside id="slide-menu" class="slide-menu">
+  <aside id="slide-menu" class="slide-menu" aria-label="Mobile Navigation">
     <div class="slide-menu-header">
       <strong>WebAudit 360</strong>
-      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+      <button id="slide-menu-close" class="slide-menu-close-btn" aria-label="Close menu"><span data-icon="x"></span></button>
     </div>
     <nav class="slide-menu-nav">
       <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> Audit History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Continuous Monitoring</a>
+      
+      <div class="slide-nav-divider"></div>
+      <div class="slide-nav-section-title">Specialized Engines</div>
+      <a href="performance.html" class="slide-nav-item"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+      <a href="responsive.html" class="slide-nav-item"><span data-icon="smartphone"></span> Responsive</a>
       <a href="technical.html" class="slide-nav-item active"><span data-icon="activity"></span> Technical Health</a>
+      <a href="technology.html" class="slide-nav-item"><span data-icon="cpu"></span> Technology Stack</a>
+      <a href="website-structure.html" class="slide-nav-item"><span data-icon="share2"></span> Structure Explorer</a>
+      <a href="visual-regression.html" class="slide-nav-item"><span data-icon="monitor"></span> Visual Regression</a>
+      <a href="api-health.html" class="slide-nav-item"><span data-icon="code"></span> API Health</a>
+      <a href="dependencies.html" class="slide-nav-item"><span data-icon="layers"></span> Dependencies</a>
+      <a href="domain-health.html" class="slide-nav-item"><span data-icon="globe"></span> Domain & DNS</a>
+
+      <div class="slide-nav-divider"></div>
+      <a href="team.html" class="slide-nav-item"><span data-icon="users"></span> Team</a>
+      <a href="integrations.html" class="slide-nav-item"><span data-icon="code"></span> Integrations</a>
+      <a href="settings.html" class="slide-nav-item"><span data-icon="settings"></span> Settings</a>
+      <a href="index.html" class="slide-nav-item"><span data-icon="globe"></span> Public Landing Page</a>
     </nav>
+    <div class="slide-menu-footer">
+      <div class="small-text">WebAudit 360 &bull; Harsh Patel</div>
+    </div>
   </aside>
 
+  <!-- App Layout -->
   <div class="app-layout">
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" aria-label="Sidebar Navigation">
       <nav class="app-sidebar-nav">
-        <div class="app-sidebar-title">Engines</div>
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> Audit History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+
+        <div class="app-sidebar-title">Specialized Engines</div>
         <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
         <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
         <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
         <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
         <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
         <a href="technical.html" class="app-sidebar-link active"><span data-icon="activity"></span> Technical Health</a>
+        <a href="technology.html" class="app-sidebar-link"><span data-icon="cpu"></span> Technology</a>
+        <a href="website-structure.html" class="app-sidebar-link"><span data-icon="share2"></span> Structure</a>
+        <a href="visual-regression.html" class="app-sidebar-link"><span data-icon="monitor"></span> Visual Regression</a>
+        <a href="api-health.html" class="app-sidebar-link"><span data-icon="code"></span> API Health</a>
+        <a href="dependencies.html" class="app-sidebar-link"><span data-icon="layers"></span> Dependencies</a>
+        <a href="domain-health.html" class="app-sidebar-link"><span data-icon="globe"></span> Domain & DNS</a>
+
+        <div class="app-sidebar-title">Configuration</div>
+        <a href="team.html" class="app-sidebar-link"><span data-icon="users"></span> Team</a>
+        <a href="integrations.html" class="app-sidebar-link"><span data-icon="code"></span> Integrations & Webhooks</a>
+        <a href="settings.html" class="app-sidebar-link"><span data-icon="settings"></span> Settings</a>
       </nav>
     </aside>
 
     <main class="app-main">
       <div class="container">
-        <div style="margin-bottom: var(--space-xl);">
-          <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">ENGINE 06</span>
-          <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">Technical Website Health</h1>
-          <p class="text-muted">Broken internal & external links, redirect loops, browser console errors, unhandled exceptions, and mixed-content</p>
+        <div class="flex items-center justify-between" style="margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">ENGINE 06</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">Technical Health Intelligence</h1>
+            <p class="text-muted">Broken link detection, HTTP response status classification, and client-side JavaScript console error streams</p>
+          </div>
+
+          <div class="flex items-center gap-sm">
+            <label for="select-audit-target" class="text-xs text-muted" style="font-weight: 600;">Audit Target:</label>
+            <select id="select-audit-target" class="form-select" style="min-width: 260px; font-size: 0.85rem;">
+              <option value="">Loading audits...</option>
+            </select>
+          </div>
         </div>
 
-        <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
-          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">Runtime Errors & Link Status</h2>
+        <div id="technical-details-container">
           <div class="empty-state">
             <div class="empty-state-icon"><span data-icon="activity"></span></div>
-            <h3 class="empty-state-title">No Technical Defects Logged</h3>
-            <p class="empty-state-desc">Technical health evaluations record console errors and broken hyperlinks during live crawler and browser execution.</p>
-            <a href="new-audit.html" class="btn btn-primary"><span data-icon="zap"></span> Run Health Scan</a>
+            <h3 class="empty-state-title">Select or Run an Audit</h3>
+            <p class="empty-state-desc">Technical health diagnostics will populate once an audit is selected.</p>
+            <a href="new-audit.html" class="btn btn-primary"><span data-icon="zap"></span> Run Technical Scan</a>
           </div>
         </div>
       </div>
+
+      <footer class="app-footer" style="padding: var(--space-xl) var(--space-md); text-align: center; border-top: 1px solid var(--border-color); margin-top: var(--space-2xl);">
+        <p class="text-xs text-muted">© 2026 WebAudit 360. All Rights Reserved. Made by Harsh Patel.</p>
+      </footer>
     </main>
   </div>
 
@@ -95,13 +163,14 @@
     import { renderIcons } from "./js/icons.js";
     import { initTheme } from "./js/theme.js";
     import { initNavigation } from "./js/navigation.js";
+    import { initTechnicalView } from "./js/technical.js";
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       renderIcons();
       initTheme();
       initNavigation();
+      await initTechnicalView();
     });
   </script>
 </body>
 </html>
-

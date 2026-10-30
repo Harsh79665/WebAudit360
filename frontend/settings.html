@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings — WebAudit 360</title>
+  <title>Settings & Preferences — WebAudit 360</title>
   
   <script>
     (function() {
@@ -26,40 +26,99 @@
 </head>
 <body>
 
+  <!-- Navbar -->
   <header class="navbar">
     <div class="container-fluid navbar-inner">
       <div class="flex items-center gap-md">
-        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle navigation menu">
+          <span data-icon="menu"></span>
+        </button>
         <a href="dashboard.html" class="nav-brand">
           <span data-icon="globe" data-icon-class="gradient-text"></span>
           <span>WebAudit <span class="gradient-text">360</span></span>
         </a>
       </div>
+
       <div class="nav-actions">
-        <div class="theme-toggle-capsule" role="button" tabindex="0">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle theme">
           <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
           <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
         </div>
-        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+        <a href="new-audit.html" class="btn btn-primary btn-sm">
+          <span data-icon="zap"></span>
+          <span>New Audit</span>
+        </a>
       </div>
     </div>
   </header>
 
+  <!-- Slide Navigation -->
   <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
-  <aside id="slide-menu" class="slide-menu">
+  <aside id="slide-menu" class="slide-menu" aria-label="Mobile Navigation">
     <div class="slide-menu-header">
       <strong>WebAudit 360</strong>
-      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+      <button id="slide-menu-close" class="slide-menu-close-btn" aria-label="Close menu"><span data-icon="x"></span></button>
     </div>
     <nav class="slide-menu-nav">
       <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> Audit History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Continuous Monitoring</a>
+      
+      <div class="slide-nav-divider"></div>
+      <div class="slide-nav-section-title">Specialized Engines</div>
+      <a href="performance.html" class="slide-nav-item"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+      <a href="responsive.html" class="slide-nav-item"><span data-icon="smartphone"></span> Responsive</a>
+      <a href="technical.html" class="slide-nav-item"><span data-icon="activity"></span> Technical Health</a>
+      <a href="technology.html" class="slide-nav-item"><span data-icon="cpu"></span> Technology Stack</a>
+      <a href="website-structure.html" class="slide-nav-item"><span data-icon="share2"></span> Structure Explorer</a>
+      <a href="visual-regression.html" class="slide-nav-item"><span data-icon="monitor"></span> Visual Regression</a>
+      <a href="api-health.html" class="slide-nav-item"><span data-icon="code"></span> API Health</a>
+      <a href="dependencies.html" class="slide-nav-item"><span data-icon="layers"></span> Dependencies</a>
+      <a href="domain-health.html" class="slide-nav-item"><span data-icon="globe"></span> Domain & DNS</a>
+
+      <div class="slide-nav-divider"></div>
+      <a href="team.html" class="slide-nav-item"><span data-icon="users"></span> Team</a>
+      <a href="integrations.html" class="slide-nav-item"><span data-icon="code"></span> Integrations</a>
       <a href="settings.html" class="slide-nav-item active"><span data-icon="settings"></span> Settings</a>
+      <a href="index.html" class="slide-nav-item"><span data-icon="globe"></span> Public Landing Page</a>
     </nav>
+    <div class="slide-menu-footer">
+      <div class="small-text">WebAudit 360 &bull; Harsh Patel</div>
+    </div>
   </aside>
 
+  <!-- App Layout -->
   <div class="app-layout">
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" aria-label="Sidebar Navigation">
       <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> Audit History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+
+        <div class="app-sidebar-title">Specialized Engines</div>
+        <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+        <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
+        <a href="technical.html" class="app-sidebar-link"><span data-icon="activity"></span> Technical Health</a>
+        <a href="technology.html" class="app-sidebar-link"><span data-icon="cpu"></span> Technology</a>
+        <a href="website-structure.html" class="app-sidebar-link"><span data-icon="share2"></span> Structure</a>
+        <a href="visual-regression.html" class="app-sidebar-link"><span data-icon="monitor"></span> Visual Regression</a>
+        <a href="api-health.html" class="app-sidebar-link"><span data-icon="code"></span> API Health</a>
+        <a href="dependencies.html" class="app-sidebar-link"><span data-icon="layers"></span> Dependencies</a>
+        <a href="domain-health.html" class="app-sidebar-link"><span data-icon="globe"></span> Domain & DNS</a>
+
         <div class="app-sidebar-title">Configuration</div>
         <a href="team.html" class="app-sidebar-link"><span data-icon="users"></span> Team</a>
         <a href="integrations.html" class="app-sidebar-link"><span data-icon="code"></span> Integrations & Webhooks</a>
@@ -68,33 +127,54 @@
     </aside>
 
     <main class="app-main">
-      <div class="container" style="max-width: 720px;">
+      <div class="container">
         <div style="margin-bottom: var(--space-xl);">
-          <h1 style="font-size: 1.75rem; font-weight: 800;">Account & Platform Settings</h1>
-          <p class="text-muted">Manage profile details, notification alerts, and theme preferences</p>
+          <h1 style="font-size: 1.75rem; font-weight: 800;">Account & Environment Settings</h1>
+          <p class="text-muted">Manage profile details, authentication credentials, scanning quotas, and notification preferences</p>
         </div>
 
-        <div class="glass-panel" style="padding: var(--space-2xl); margin-bottom: var(--space-xl);">
-          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-md);">User Profile</h2>
-          <form id="profile-form">
-            <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <input type="text" id="settings-name" class="form-input" value="Harsh Patel" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Email Address</label>
-              <input type="email" id="settings-email" class="form-input" value="creator@webaudit360.io" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-sm"><span data-icon="check"></span> Save Changes</button>
-          </form>
-        </div>
+        <div class="grid grid-2" style="gap: var(--space-xl);">
+          <!-- Profile Card -->
+          <div class="glass-panel" style="padding: var(--space-xl);">
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: var(--space-md);">Developer Profile</h3>
+            <form onsubmit="event.preventDefault(); alert('Profile preferences saved successfully.');">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" value="Harsh Patel" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" value="creator@webaudit360.io" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top: var(--space-md);">
+                Save Changes
+              </button>
+            </form>
+          </div>
 
-        <div class="glass-panel" style="padding: var(--space-2xl);">
-          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-xs); color: var(--color-critical);">Danger Zone</h2>
-          <p class="small-text text-muted" style="margin-bottom: var(--space-md);">Irreversible actions regarding account deletion and stored audit data</p>
-          <button class="btn btn-danger btn-sm" id="delete-account-btn">Delete Account & Wipe Audit History</button>
+          <!-- Security & Password Card -->
+          <div class="glass-panel" style="padding: var(--space-xl);">
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: var(--space-md);">Security & Password</h3>
+            <form onsubmit="event.preventDefault(); alert('Password updated! Please use your new password next time you login.'); this.reset();">
+              <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-input" placeholder="••••••••" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-input" placeholder="Minimum 8 characters" required>
+              </div>
+              <button type="submit" class="btn btn-secondary" style="margin-top: var(--space-md);">
+                Update Password
+              </button>
+            </form>
+          </div>
         </div>
       </div>
+
+      <footer class="app-footer" style="padding: var(--space-xl) var(--space-md); text-align: center; border-top: 1px solid var(--border-color); margin-top: var(--space-2xl);">
+        <p class="text-xs text-muted">© 2026 WebAudit 360. All Rights Reserved. Made by Harsh Patel.</p>
+      </footer>
     </main>
   </div>
 
@@ -102,32 +182,12 @@
     import { renderIcons } from "./js/icons.js";
     import { initTheme } from "./js/theme.js";
     import { initNavigation } from "./js/navigation.js";
-    import { auth } from "./js/auth.js";
-    import { showToast } from "./js/utils.js";
 
     document.addEventListener("DOMContentLoaded", () => {
       renderIcons();
       initTheme();
       initNavigation();
-
-      const user = auth.getUser();
-      if (user) {
-        if (user.full_name) document.getElementById("settings-name").value = user.full_name;
-        if (user.email) document.getElementById("settings-email").value = user.email;
-      }
-
-      document.getElementById("profile-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        showToast("Profile Updated", "Account settings saved successfully.", "success");
-      });
-
-      document.getElementById("delete-account-btn").addEventListener("click", () => {
-        if (confirm("Are you sure? This will delete all your audit history and project configurations.")) {
-          auth.logout();
-        }
-      });
     });
   </script>
 </body>
 </html>
-

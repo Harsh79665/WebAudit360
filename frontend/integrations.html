@@ -26,40 +26,99 @@
 </head>
 <body>
 
+  <!-- Navbar -->
   <header class="navbar">
     <div class="container-fluid navbar-inner">
       <div class="flex items-center gap-md">
-        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle navigation menu">
+          <span data-icon="menu"></span>
+        </button>
         <a href="dashboard.html" class="nav-brand">
           <span data-icon="globe" data-icon-class="gradient-text"></span>
           <span>WebAudit <span class="gradient-text">360</span></span>
         </a>
       </div>
+
       <div class="nav-actions">
-        <div class="theme-toggle-capsule" role="button" tabindex="0">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle theme">
           <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
           <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
         </div>
-        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+        <a href="new-audit.html" class="btn btn-primary btn-sm">
+          <span data-icon="zap"></span>
+          <span>New Audit</span>
+        </a>
       </div>
     </div>
   </header>
 
+  <!-- Slide Navigation -->
   <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
-  <aside id="slide-menu" class="slide-menu">
+  <aside id="slide-menu" class="slide-menu" aria-label="Mobile Navigation">
     <div class="slide-menu-header">
       <strong>WebAudit 360</strong>
-      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+      <button id="slide-menu-close" class="slide-menu-close-btn" aria-label="Close menu"><span data-icon="x"></span></button>
     </div>
     <nav class="slide-menu-nav">
       <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> Audit History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Continuous Monitoring</a>
+      
+      <div class="slide-nav-divider"></div>
+      <div class="slide-nav-section-title">Specialized Engines</div>
+      <a href="performance.html" class="slide-nav-item"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+      <a href="responsive.html" class="slide-nav-item"><span data-icon="smartphone"></span> Responsive</a>
+      <a href="technical.html" class="slide-nav-item"><span data-icon="activity"></span> Technical Health</a>
+      <a href="technology.html" class="slide-nav-item"><span data-icon="cpu"></span> Technology Stack</a>
+      <a href="website-structure.html" class="slide-nav-item"><span data-icon="share2"></span> Structure Explorer</a>
+      <a href="visual-regression.html" class="slide-nav-item"><span data-icon="monitor"></span> Visual Regression</a>
+      <a href="api-health.html" class="slide-nav-item"><span data-icon="code"></span> API Health</a>
+      <a href="dependencies.html" class="slide-nav-item"><span data-icon="layers"></span> Dependencies</a>
+      <a href="domain-health.html" class="slide-nav-item"><span data-icon="globe"></span> Domain & DNS</a>
+
+      <div class="slide-nav-divider"></div>
+      <a href="team.html" class="slide-nav-item"><span data-icon="users"></span> Team</a>
       <a href="integrations.html" class="slide-nav-item active"><span data-icon="code"></span> Integrations</a>
+      <a href="settings.html" class="slide-nav-item"><span data-icon="settings"></span> Settings</a>
+      <a href="index.html" class="slide-nav-item"><span data-icon="globe"></span> Public Landing Page</a>
     </nav>
+    <div class="slide-menu-footer">
+      <div class="small-text">WebAudit 360 &bull; Harsh Patel</div>
+    </div>
   </aside>
 
+  <!-- App Layout -->
   <div class="app-layout">
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" aria-label="Sidebar Navigation">
       <nav class="app-sidebar-nav">
+        <div class="app-sidebar-title">Core Workspace</div>
+        <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
+        <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
+        <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
+        <a href="findings.html" class="app-sidebar-link"><span data-icon="alertTriangle"></span> Issue Manager</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> Audit History</a>
+        <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+
+        <div class="app-sidebar-title">Specialized Engines</div>
+        <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+        <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
+        <a href="technical.html" class="app-sidebar-link"><span data-icon="activity"></span> Technical Health</a>
+        <a href="technology.html" class="app-sidebar-link"><span data-icon="cpu"></span> Technology</a>
+        <a href="website-structure.html" class="app-sidebar-link"><span data-icon="share2"></span> Structure</a>
+        <a href="visual-regression.html" class="app-sidebar-link"><span data-icon="monitor"></span> Visual Regression</a>
+        <a href="api-health.html" class="app-sidebar-link"><span data-icon="code"></span> API Health</a>
+        <a href="dependencies.html" class="app-sidebar-link"><span data-icon="layers"></span> Dependencies</a>
+        <a href="domain-health.html" class="app-sidebar-link"><span data-icon="globe"></span> Domain & DNS</a>
+
         <div class="app-sidebar-title">Configuration</div>
         <a href="team.html" class="app-sidebar-link"><span data-icon="users"></span> Team</a>
         <a href="integrations.html" class="app-sidebar-link active"><span data-icon="code"></span> Integrations & Webhooks</a>
@@ -69,41 +128,49 @@
 
     <main class="app-main">
       <div class="container">
-        <div style="margin-bottom: var(--space-xl);">
-          <h1 style="font-size: 1.75rem; font-weight: 800;">Developer Integrations & Webhooks</h1>
-          <p class="text-muted">Manage scoped API keys, HMAC-signed webhooks, and GitHub issue exports</p>
+        <div class="flex items-center justify-between" style="margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+          <div>
+            <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">DEVELOPER TOOLING</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">Integrations, Webhooks & API Keys</h1>
+            <p class="text-muted">Connect WebAudit 360 to GitHub workflows, CI/CD deployment pipelines, and custom event handlers</p>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-lg">
-          <!-- API Keys -->
-          <div class="glass-panel" style="padding: var(--space-xl);">
-            <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
-              <h2 style="font-size: 1.125rem; font-weight: 700;">Programmatic API Keys</h2>
-              <button class="btn btn-primary btn-sm" id="generate-key-btn"><span data-icon="zap"></span> Create Key</button>
+        <!-- API Keys Management -->
+        <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700;">Scoped API Keys</h3>
+              <p class="text-xs text-muted">Use API keys with the <code>Authorization: Bearer &lt;key&gt;</code> header for CLI or Flutter apps.</p>
             </div>
-            <p class="small-text text-secondary" style="margin-bottom: var(--space-md);">
-              Authenticate automated CI/CD pipelines. Keys are displayed once upon creation and stored exclusively as SHA-256 hashes.
-            </p>
-            <div id="api-keys-list" class="empty-state" style="padding: var(--space-md);">
-              <span class="small-text text-muted">No API keys created yet.</span>
-            </div>
+            <button id="generate-api-key-btn" class="btn btn-primary btn-sm">
+              <span data-icon="plus"></span> Generate New API Key
+            </button>
           </div>
+          <div id="api-key-display"></div>
+        </div>
 
-          <!-- Webhooks -->
-          <div class="glass-panel" style="padding: var(--space-xl);">
-            <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
-              <h2 style="font-size: 1.125rem; font-weight: 700;">HMAC-Signed Webhooks</h2>
-              <button class="btn btn-secondary btn-sm" id="create-webhook-btn"><span data-icon="activity"></span> Add Endpoint</button>
+        <!-- Webhook Configuration -->
+        <div class="glass-panel" style="padding: var(--space-xl);">
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: var(--space-md);">HMAC-Signed Webhooks</h3>
+          <p class="text-xs text-muted" style="margin-bottom: var(--space-md);">Receive instantaneous POST notifications when audits complete or critical vulnerabilities are discovered.</p>
+          <form id="create-webhook-form" class="grid grid-2" style="gap: var(--space-md); align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Endpoint URL</label>
+              <input type="url" name="webhook_url" class="form-input" placeholder="https://api.yourdomain.com/webhooks/webaudit" required>
             </div>
-            <p class="small-text text-secondary" style="margin-bottom: var(--space-md);">
-              Deliver real-time JSON events when audits finish, critical vulnerabilities are discovered, or continuous monitoring detects regressions.
-            </p>
-            <div id="webhooks-list" class="empty-state" style="padding: var(--space-md);">
-              <span class="small-text text-muted">No webhook destinations registered.</span>
+            <div>
+              <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                <span data-icon="plus"></span> Register Webhook
+              </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
+
+      <footer class="app-footer" style="padding: var(--space-xl) var(--space-md); text-align: center; border-top: 1px solid var(--border-color); margin-top: var(--space-2xl);">
+        <p class="text-xs text-muted">© 2026 WebAudit 360. All Rights Reserved. Made by Harsh Patel.</p>
+      </footer>
     </main>
   </div>
 
@@ -111,24 +178,14 @@
     import { renderIcons } from "./js/icons.js";
     import { initTheme } from "./js/theme.js";
     import { initNavigation } from "./js/navigation.js";
-    import { showToast } from "./js/utils.js";
+    import { initIntegrationsView } from "./js/integrations.js";
 
     document.addEventListener("DOMContentLoaded", () => {
       renderIcons();
       initTheme();
       initNavigation();
-
-      document.getElementById("generate-key-btn").addEventListener("click", () => {
-        const label = prompt("Enter Key Label (e.g. GitHub Actions CI):");
-        if (label) showToast("API Key Created", `Key created for ${label}. Stored as SHA-256 hash.`, "success");
-      });
-
-      document.getElementById("create-webhook-btn").addEventListener("click", () => {
-        const url = prompt("Enter Webhook Endpoint URL (HTTPS):");
-        if (url) showToast("Webhook Registered", `Events will be dispatched with HMAC signatures to ${url}.`, "success");
-      });
+      initIntegrationsView();
     });
   </script>
 </body>
 </html>
-

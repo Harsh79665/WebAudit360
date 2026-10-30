@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Issue Manager & Findings — WebAudit 360</title>
+  <title>Issue Manager & Findings Lifecycle — WebAudit 360</title>
   
   <script>
     (function() {
@@ -26,73 +26,178 @@
 </head>
 <body>
 
+  <!-- Navbar -->
   <header class="navbar">
     <div class="container-fluid navbar-inner">
       <div class="flex items-center gap-md">
-        <button id="menu-toggle-btn" class="menu-toggle-btn"><span data-icon="menu"></span></button>
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle navigation menu">
+          <span data-icon="menu"></span>
+        </button>
         <a href="dashboard.html" class="nav-brand">
           <span data-icon="globe" data-icon-class="gradient-text"></span>
           <span>WebAudit <span class="gradient-text">360</span></span>
         </a>
       </div>
+
       <div class="nav-actions">
-        <div class="theme-toggle-capsule" role="button" tabindex="0">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle theme">
           <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
           <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
         </div>
-        <a href="new-audit.html" class="btn btn-primary btn-sm"><span data-icon="zap"></span> New Audit</a>
+        <a href="new-audit.html" class="btn btn-primary btn-sm">
+          <span data-icon="zap"></span>
+          <span>New Audit</span>
+        </a>
       </div>
     </div>
   </header>
 
+  <!-- Slide Navigation -->
   <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
-  <aside id="slide-menu" class="slide-menu">
+  <aside id="slide-menu" class="slide-menu" aria-label="Mobile Navigation">
     <div class="slide-menu-header">
       <strong>WebAudit 360</strong>
-      <button id="slide-menu-close" class="slide-menu-close-btn"><span data-icon="x"></span></button>
+      <button id="slide-menu-close" class="slide-menu-close-btn" aria-label="Close menu"><span data-icon="x"></span></button>
     </div>
     <nav class="slide-menu-nav">
       <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
       <a href="findings.html" class="slide-nav-item active"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> Audit History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Continuous Monitoring</a>
+      
+      <div class="slide-nav-divider"></div>
+      <div class="slide-nav-section-title">Specialized Engines</div>
+      <a href="performance.html" class="slide-nav-item"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+      <a href="responsive.html" class="slide-nav-item"><span data-icon="smartphone"></span> Responsive</a>
+      <a href="technical.html" class="slide-nav-item"><span data-icon="activity"></span> Technical Health</a>
+      <a href="technology.html" class="slide-nav-item"><span data-icon="cpu"></span> Technology Stack</a>
+      <a href="website-structure.html" class="slide-nav-item"><span data-icon="share2"></span> Structure Explorer</a>
+      <a href="visual-regression.html" class="slide-nav-item"><span data-icon="monitor"></span> Visual Regression</a>
+      <a href="api-health.html" class="slide-nav-item"><span data-icon="code"></span> API Health</a>
+      <a href="dependencies.html" class="slide-nav-item"><span data-icon="layers"></span> Dependencies</a>
+      <a href="domain-health.html" class="slide-nav-item"><span data-icon="globe"></span> Domain & DNS</a>
+
+      <div class="slide-nav-divider"></div>
+      <a href="team.html" class="slide-nav-item"><span data-icon="users"></span> Team</a>
+      <a href="integrations.html" class="slide-nav-item"><span data-icon="code"></span> Integrations</a>
+      <a href="settings.html" class="slide-nav-item"><span data-icon="settings"></span> Settings</a>
+      <a href="index.html" class="slide-nav-item"><span data-icon="globe"></span> Public Landing Page</a>
     </nav>
+    <div class="slide-menu-footer">
+      <div class="small-text">WebAudit 360 &bull; Harsh Patel</div>
+    </div>
   </aside>
 
+  <!-- App Layout -->
   <div class="app-layout">
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" aria-label="Sidebar Navigation">
       <nav class="app-sidebar-nav">
         <div class="app-sidebar-title">Core Workspace</div>
         <a href="dashboard.html" class="app-sidebar-link"><span data-icon="gauge"></span> Dashboard</a>
         <a href="new-audit.html" class="app-sidebar-link"><span data-icon="zap"></span> New Audit</a>
         <a href="projects.html" class="app-sidebar-link"><span data-icon="layers"></span> Projects</a>
         <a href="findings.html" class="app-sidebar-link active"><span data-icon="alertTriangle"></span> Issue Manager</a>
-        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> History</a>
+        <a href="history.html" class="app-sidebar-link"><span data-icon="clock"></span> Audit History</a>
         <a href="monitoring.html" class="app-sidebar-link"><span data-icon="activity"></span> Monitoring</a>
+
+        <div class="app-sidebar-title">Specialized Engines</div>
+        <a href="performance.html" class="app-sidebar-link"><span data-icon="gauge"></span> Performance</a>
+        <a href="seo.html" class="app-sidebar-link"><span data-icon="search"></span> SEO</a>
+        <a href="accessibility.html" class="app-sidebar-link"><span data-icon="accessibility"></span> Accessibility</a>
+        <a href="security.html" class="app-sidebar-link"><span data-icon="shield"></span> Security</a>
+        <a href="responsive.html" class="app-sidebar-link"><span data-icon="smartphone"></span> Responsive</a>
+        <a href="technical.html" class="app-sidebar-link"><span data-icon="activity"></span> Technical Health</a>
+        <a href="technology.html" class="app-sidebar-link"><span data-icon="cpu"></span> Technology</a>
+        <a href="website-structure.html" class="app-sidebar-link"><span data-icon="share2"></span> Structure</a>
+        <a href="visual-regression.html" class="app-sidebar-link"><span data-icon="monitor"></span> Visual Regression</a>
+        <a href="api-health.html" class="app-sidebar-link"><span data-icon="code"></span> API Health</a>
+        <a href="dependencies.html" class="app-sidebar-link"><span data-icon="layers"></span> Dependencies</a>
+        <a href="domain-health.html" class="app-sidebar-link"><span data-icon="globe"></span> Domain & DNS</a>
+
+        <div class="app-sidebar-title">Configuration</div>
+        <a href="team.html" class="app-sidebar-link"><span data-icon="users"></span> Team</a>
+        <a href="integrations.html" class="app-sidebar-link"><span data-icon="code"></span> Integrations & Webhooks</a>
+        <a href="settings.html" class="app-sidebar-link"><span data-icon="settings"></span> Settings</a>
       </nav>
     </aside>
 
     <main class="app-main">
       <div class="container">
-        <div class="flex items-center justify-between flex-wrap gap-md" style="margin-bottom: var(--space-xl);">
+        <div class="flex items-center justify-between" style="margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
           <div>
-            <h1 style="font-size: 1.75rem; font-weight: 800;">Issue Manager & Lifecycle</h1>
-            <p class="text-muted">Track findings across Open, In Progress, Fixed, and Retest verification states</p>
+            <h1 style="font-size: 1.75rem; font-weight: 800;">Issue Manager & Findings Lifecycle</h1>
+            <p class="text-muted">Track diagnostic findings, update issue states (Open, Acknowledged, Fixed, Accepted Risk), and trigger retests</p>
           </div>
-          <div class="flex gap-xs flex-wrap">
-            <button class="filter-capsule active" data-status="ALL">All Statuses</button>
-            <button class="filter-capsule" data-status="OPEN">Open</button>
-            <button class="filter-capsule" data-status="FIXED">Fixed</button>
-            <button class="filter-capsule" data-status="ACCEPTED_RISK">Accepted Risk</button>
+          <span id="findings-count" class="badge">Loading...</span>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="glass-panel" style="padding: var(--space-md); margin-bottom: var(--space-lg); display: flex; gap: var(--space-md); flex-wrap: wrap;">
+          <div>
+            <select id="filter-category" class="form-select text-sm">
+              <option value="">All Categories</option>
+              <option value="PERFORMANCE">Performance</option>
+              <option value="SEO">SEO</option>
+              <option value="ACCESSIBILITY">Accessibility</option>
+              <option value="SECURITY_PASSIVE">Security</option>
+              <option value="RESPONSIVE">Responsive</option>
+              <option value="TECHNICAL">Technical Health</option>
+              <option value="DOMAIN">Domain & DNS</option>
+            </select>
+          </div>
+
+          <div>
+            <select id="filter-severity" class="form-select text-sm">
+              <option value="">All Severities</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+              <option value="INFO">Info</option>
+            </select>
+          </div>
+
+          <div>
+            <select id="filter-status" class="form-select text-sm">
+              <option value="">All Statuses</option>
+              <option value="OPEN" selected>Open Only</option>
+              <option value="ACKNOWLEDGED">Acknowledged</option>
+              <option value="FIXED">Fixed</option>
+              <option value="ACCEPTED_RISK">Accepted Risk</option>
+            </select>
           </div>
         </div>
 
-        <div id="findings-manager-list" class="findings-container">
-          <div class="empty-state">
-            <div class="empty-state-icon"><span data-icon="check"></span></div>
-            <h3 class="empty-state-title">No Outstanding Issues</h3>
-            <p class="empty-state-desc">Your scanned targets currently have zero unresolved issues.</p>
+        <!-- Findings Table -->
+        <div class="glass-panel" style="padding: var(--space-xl);">
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Finding Title</th>
+                  <th>Category</th>
+                  <th>Status Transition</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="findings-table-body">
+                <tr><td colspan="6" style="text-align:center;">Loading findings...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+
+      <footer class="app-footer" style="padding: var(--space-xl) var(--space-md); text-align: center; border-top: 1px solid var(--border-color); margin-top: var(--space-2xl);">
+        <p class="text-xs text-muted">© 2026 WebAudit 360. All Rights Reserved. Made by Harsh Patel.</p>
+      </footer>
     </main>
   </div>
 
@@ -100,91 +205,14 @@
     import { renderIcons } from "./js/icons.js";
     import { initTheme } from "./js/theme.js";
     import { initNavigation } from "./js/navigation.js";
-    import { apiClient } from "./js/api.js";
-    import { escapeHtml, showToast } from "./js/utils.js";
+    import { initFindingsManager } from "./js/findings.js";
 
     document.addEventListener("DOMContentLoaded", async () => {
       renderIcons();
       initTheme();
       initNavigation();
-
-      await loadFindings();
+      await initFindingsManager();
     });
-
-    async function loadFindings(statusFilter = "ALL") {
-      const container = document.getElementById("findings-manager-list");
-      try {
-        const url = statusFilter === "ALL" ? "/findings" : `/findings?status=${statusFilter}`;
-        const data = await apiClient.get(url).catch(() => ({ items: [] }));
-        const findings = data.items || [];
-
-        if (findings.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon"><span data-icon="check"></span></div>
-              <h3 class="empty-state-title">No Findings Match Filter</h3>
-              <p class="empty-state-desc">No issues currently match this status filter.</p>
-            </div>
-          `;
-          renderIcons(container);
-          return;
-        }
-
-        let html = "";
-        findings.forEach((f) => {
-          html += `
-            <div class="finding-card severity-${(f.severity || "info").toLowerCase()}">
-              <div class="finding-header">
-                <div class="finding-title">${escapeHtml(f.title)}</div>
-                <div class="flex gap-xs">
-                  <span class="badge">${escapeHtml(f.status || "OPEN")}</span>
-                  <span class="badge">${escapeHtml(f.severity)}</span>
-                </div>
-              </div>
-              <p class="finding-description">${escapeHtml(f.description)}</p>
-              ${f.recommendation ? `<div class="remediation-box small-text"><strong>Fix:</strong> ${escapeHtml(f.recommendation)}</div>` : ""}
-              <div class="flex justify-between items-center" style="margin-top: var(--space-md); padding-top: var(--space-xs); border-top: 1px solid var(--border-color);">
-                <span class="small-text text-muted">Rule: ${escapeHtml(f.rule_id)}</span>
-                <div class="flex gap-xs">
-                  <button class="btn btn-secondary btn-sm status-btn" data-id="${f.id}" data-action="FIXED">Mark Fixed</button>
-                  <button class="btn btn-primary btn-sm retest-btn" data-id="${f.id}">Retest Rule</button>
-                </div>
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-        renderIcons(container);
-
-        document.querySelectorAll(".status-btn").forEach((btn) => {
-          btn.addEventListener("click", async () => {
-            const id = btn.getAttribute("data-id");
-            const action = btn.getAttribute("data-action");
-            try {
-              await apiClient.put(`/findings/${id}/status`, { status: action, reason: "Verified by developer" });
-              showToast("Status Updated", `Issue marked as ${action}.`, "success");
-              await loadFindings(statusFilter);
-            } catch (err) {
-              showToast("Error", err.message, "error");
-            }
-          });
-        });
-
-        document.querySelectorAll(".retest-btn").forEach((btn) => {
-          btn.addEventListener("click", async () => {
-            const id = btn.getAttribute("data-id");
-            try {
-              await apiClient.post(`/findings/${id}/retest`, {});
-              showToast("Retest Queued", "Verification scan scheduled.", "info");
-            } catch (err) {
-              showToast("Error", err.message, "error");
-            }
-          });
-        });
-      } catch (e) {}
-    }
   </script>
 </body>
 </html>
-

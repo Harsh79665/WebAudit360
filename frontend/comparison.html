@@ -132,12 +132,39 @@
           <div>
             <span class="badge" style="background: var(--accent-glow); color: var(--accent-primary); font-weight: 700;">BENCHMARKING</span>
             <h1 style="font-size: 1.75rem; font-weight: 800; margin-top: 4px;">Audit Comparison & Delta Analysis</h1>
-            <p class="text-muted">Compare two audits side-by-side to track score progressions and regression deltas</p>
+            <p class="text-muted">Compare two audits side-by-side or benchmark live competitor URLs to track score progressions and regression deltas</p>
           </div>
         </div>
 
-        <!-- Audit Selection Form -->
-        <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
+        <!-- Mode Toggle Tabs -->
+        <div class="flex items-center gap-sm mb-lg">
+          <button id="tab-live-urls" class="btn btn-primary btn-sm">Direct Competitor URL Benchmark</button>
+          <button id="tab-stored-audits" class="btn btn-secondary btn-sm">Stored Audits Diff</button>
+        </div>
+
+        <!-- Live URL Benchmark Form -->
+        <div id="live-url-panel" class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
+          <form id="compare-urls-form" class="grid grid-3" style="gap: var(--space-md); align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="url-a" class="form-label">Primary Site URL (A)</label>
+              <input type="url" id="url-a" class="form-input" placeholder="https://mysite.com" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="url-b" class="form-label">Competitor Site URL (B)</label>
+              <input type="url" id="url-b" class="form-input" placeholder="https://competitor.com" required>
+            </div>
+
+            <div>
+              <button type="submit" id="btn-run-live-comparison" class="btn btn-primary" style="width: 100%;">
+                <span data-icon="zap"></span> Run Competitor Benchmark
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Audit Selection Form (Stored) -->
+        <div id="stored-audits-panel" class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl); display: none;">
           <form id="compare-audits-form" class="grid grid-3" style="gap: var(--space-md); align-items: end;">
             <div class="form-group" style="margin-bottom: 0;">
               <label for="select-audit-a" class="form-label">Baseline Audit A</label>

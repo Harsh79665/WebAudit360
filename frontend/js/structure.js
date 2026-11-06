@@ -21,17 +21,31 @@ async function populateAuditSelector() {
   if (!auditSelect) return;
 
   try {
-    const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
+    const data = await apiClient.get("/audits?limit=50").catch(() => ({ items: [] }));
+    let audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = parseInt(urlParams.get("id"), 10);
+
+    let targetAudit = !isNaN(requestedId) && requestedId > 0 ? audits.find(a => a.id === requestedId) : null;
+    if (!targetAudit && !isNaN(requestedId) && requestedId > 0) {
+      try {
+        const direct = await apiClient.get(`/audits/${requestedId}`);
+        if (direct && direct.id) {
+          targetAudit = direct;
+          audits.unshift(direct);
+        }
+      } catch (_) {}
+    }
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
       return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const requestedId = parseInt(urlParams.get("id"), 10);
-    const targetAudit = audits.find(a => a.id === requestedId) || audits[0];
+    if (!targetAudit) {
+      targetAudit = audits[0];
+    }
 
     auditSelect.innerHTML = audits.map(a => `
       <option value="${a.id}" ${a.id === targetAudit.id ? 'selected' : ''}>${escapeHtml(a.target_url)} (${a.scan_mode}) - ${formatDate(a.created_at)}</option>

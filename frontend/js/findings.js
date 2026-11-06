@@ -30,7 +30,11 @@ export async function loadFindings() {
   const sevVal = document.getElementById("filter-severity")?.value || "";
   const statVal = document.getElementById("filter-status")?.value || "";
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const auditId = urlParams.get("id") || urlParams.get("audit_id");
+
   let query = "/findings?limit=50";
+  if (auditId) query += `&audit_id=${encodeURIComponent(auditId)}`;
   if (catVal) query += `&category=${encodeURIComponent(catVal)}`;
   if (sevVal) query += `&severity=${encodeURIComponent(sevVal)}`;
   if (statVal) query += `&status=${encodeURIComponent(statVal)}`;

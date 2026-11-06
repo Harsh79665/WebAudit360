@@ -25,12 +25,15 @@ async def list_findings(
     status: Optional[str] = None,
     category: Optional[str] = None,
     severity: Optional[str] = None,
+    audit_id: Optional[int] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     session: AsyncSession = Depends(get_db)
 ):
-    """Lists findings across audits with optional status, category, and severity filtering."""
+    """Lists findings across audits with optional status, category, severity, and audit_id filtering."""
     query = select(AuditFinding)
+    if audit_id:
+        query = query.where(AuditFinding.audit_id == audit_id)
     if status and status.upper() in FindingStatus.__members__:
         query = query.where(AuditFinding.status == FindingStatus[status.upper()])
     if category:
@@ -43,8 +46,14 @@ async def list_findings(
     findings = result.scalars().all()
 
     total_query = select(func.count(AuditFinding.id))
+    if audit_id:
+        total_query = total_query.where(AuditFinding.audit_id == audit_id)
     if status and status.upper() in FindingStatus.__members__:
         total_query = total_query.where(AuditFinding.status == FindingStatus[status.upper()])
+    if category:
+        total_query = total_query.where(AuditFinding.category == category.upper())
+    if severity:
+        total_query = total_query.where(AuditFinding.severity == severity.upper())
     total = (await session.execute(total_query)).scalar() or 0
 
     return FindingListResponse(

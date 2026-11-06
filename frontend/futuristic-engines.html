@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10 Futuristic Engines — WebAudit 360</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('webaudit360_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reports.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .engines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .engine-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.2s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .engine-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+    .engine-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .engine-badge.wave1 { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .engine-badge.wave2 { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .patch-box {
+      background: #1e1e2e;
+      color: #a6adc8;
+      font-family: monospace;
+      font-size: 0.8rem;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      max-height: 200px;
+      margin-top: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container-fluid navbar-inner">
+      <div class="flex items-center gap-md">
+        <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Toggle navigation menu">
+          <span data-icon="menu"></span>
+        </button>
+        <a href="dashboard.html" class="nav-brand">
+          <span data-icon="globe" data-icon-class="gradient-text"></span>
+          <span>WebAudit <span class="gradient-text">360</span></span>
+        </a>
+      </div>
+
+      <div class="nav-actions">
+        <div class="theme-toggle-capsule" role="button" tabindex="0" aria-label="Toggle theme">
+          <div class="theme-toggle-option active" data-theme-val="light"><span data-icon="sun"></span></div>
+          <div class="theme-toggle-option" data-theme-val="dark"><span data-icon="moon"></span></div>
+        </div>
+        <a href="new-audit.html" class="btn btn-primary btn-sm">
+          <span data-icon="zap"></span>
+          <span>New Audit</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Navigation -->
+  <div id="slide-menu-backdrop" class="slide-menu-backdrop"></div>
+  <aside id="slide-menu" class="slide-menu" aria-label="Mobile Navigation">
+    <div class="slide-menu-header">
+      <strong>WebAudit 360</strong>
+      <button id="slide-menu-close" class="slide-menu-close-btn" aria-label="Close menu"><span data-icon="x"></span></button>
+    </div>
+    <nav class="slide-menu-nav">
+      <a href="dashboard.html" class="slide-nav-item"><span data-icon="gauge"></span> Dashboard</a>
+      <a href="new-audit.html" class="slide-nav-item"><span data-icon="zap"></span> New Audit</a>
+      <a href="projects.html" class="slide-nav-item"><span data-icon="layers"></span> Projects</a>
+      <a href="findings.html" class="slide-nav-item"><span data-icon="alertTriangle"></span> Issue Manager</a>
+      <a href="history.html" class="slide-nav-item"><span data-icon="clock"></span> Audit History</a>
+      <a href="monitoring.html" class="slide-nav-item"><span data-icon="activity"></span> Continuous Monitoring</a>
+      
+      <div class="slide-nav-divider"></div>
+      <div class="slide-nav-section-title">Specialized Engines</div>
+      <a href="performance.html" class="slide-nav-item"><span data-icon="gauge"></span> Performance</a>
+      <a href="seo.html" class="slide-nav-item"><span data-icon="search"></span> SEO</a>
+      <a href="accessibility.html" class="slide-nav-item"><span data-icon="accessibility"></span> Accessibility</a>
+      <a href="security.html" class="slide-nav-item"><span data-icon="shield"></span> Security</a>
+      <a href="visual-regression.html" class="slide-nav-item"><span data-icon="monitor"></span> Visual Regression</a>
+      <a href="futuristic-engines.html" class="slide-nav-item active"><span data-icon="zap"></span> 10 Futuristic Engines</a>
+      <a href="comparison.html" class="slide-nav-item"><span data-icon="gitPullRequest"></span> Competitor Comparison</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="container py-xl">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-md mb-xl">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">10 Futuristic Intelligence Engines</h1>
+        <p class="text-muted mt-xs">Next-generation client-side runtime sandboxing, post-quantum crypto radar, generative SEO, and automated 1-click code remediations.</p>
+      </div>
+      <div class="flex items-center gap-sm">
+        <select id="audit-select" class="form-select text-sm" style="min-width: 240px;">
+          <option value="">Select Audit to Inspect...</option>
+        </select>
+        <button id="run-futuristic-btn" class="btn btn-primary btn-sm">
+          <span data-icon="play"></span>
+          <span>Analyze URL</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Audit Target Card -->
+    <div id="target-summary-card" class="card p-md mb-lg" style="display: none;">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs uppercase text-muted font-semibold">Active Audit Target</span>
+          <h3 id="target-url-text" class="text-lg font-bold">https://example.com</h3>
+        </div>
+        <div class="text-right">
+          <span class="text-xs uppercase text-muted font-semibold">Status</span>
+          <div id="target-status-badge" class="badge badge-success">COMPLETED</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 Engines Grid -->
+    <div class="engines-grid" id="engines-container">
+      <!-- Cards rendered dynamically via js/futuristic-engines.js -->
+    </div>
+  </main>
+
+  <script src="js/icons.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/futuristic-engines.js"></script>
+</body>
+</html>

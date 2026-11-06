@@ -5,6 +5,7 @@ Author: Harsh Patel
 from fastapi import APIRouter
 
 from backend.app.api.v1.endpoints import (
+    api_keys,
     auth,
     projects,
     audits,
@@ -13,6 +14,10 @@ from backend.app.api.v1.endpoints import (
     monitoring,
     authorizations,
     health,
+    team,
+    visual,
+    webhooks,
+    comparisons,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -25,4 +30,8 @@ api_router.include_router(reports.router)
 api_router.include_router(monitoring.router)
 api_router.include_router(authorizations.router)
 api_router.include_router(health.router)
-
+api_router.include_router(api_keys.router)
+api_router.include_router(webhooks.router)
+api_router.include_router(team.router)
+api_router.include_router(visual.router)
+api_router.include_router(comparisons.router)

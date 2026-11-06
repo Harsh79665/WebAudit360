@@ -189,10 +189,14 @@
               <tbody>
         `;
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedId = parseInt(urlParams.get("id"), 10);
+
         audits.forEach((audit) => {
           const scoreObj = getScoreDetails(audit.overall_score);
+          const isHighlight = requestedId && audit.id === requestedId;
           tableHtml += `
-            <tr>
+            <tr style="${isHighlight ? 'background: var(--accent-glow, rgba(6, 182, 212, 0.12)); font-weight: 500;' : ''}">
               <td><code class="mono" style="font-weight:600;">${escapeHtml(audit.target_url)}</code></td>
               <td>${escapeHtml(audit.scan_mode)}</td>
               <td>${escapeHtml(audit.device_profile)}</td>

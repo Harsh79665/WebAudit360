@@ -19,9 +19,12 @@ from backend.app.models.entities import (
     AuditFinding,
     AuditPage,
     AuditStatus,
+    DomainAuthorization,
     FindingHistory,
     FindingSeverity,
     FindingStatus,
+    Project,
+    VerificationStatus,
 )
 from backend.app.engines.crawler.engine import CrawlerEngine
 from backend.app.engines.performance.engine import PerformanceEngine
@@ -33,6 +36,17 @@ from backend.app.engines.responsive.engine import ResponsiveEngine
 from backend.app.engines.technology.engine import TechnologyEngine
 from backend.app.engines.third_party.engine import ThirdPartyEngine
 from backend.app.engines.domain.engine import DomainEngine
+from backend.app.engines.visual.engine import VisualRegressionEngine
+from backend.app.engines.loaf.engine import LoAFEngine
+from backend.app.engines.magecart.engine import MagecartEngine
+from backend.app.engines.carbon.engine import CarbonEngine
+from backend.app.engines.secrets.engine import SecretsHarvesterEngine
+from backend.app.engines.post_quantum.engine import PostQuantumDNSSECEngine
+from backend.app.engines.geo.engine import GEOEngine
+from backend.app.engines.privacy.engine import ZeroTrustPrivacyEngine
+from backend.app.engines.layout_defects.engine import LayoutDefectsEngine
+from backend.app.engines.user_journey.engine import SyntheticUserJourneyEngine
+from backend.app.engines.remediation.engine import CodeRemediationEngine
 from backend.app.scoring.calculator import calculate_overall_score
 
 
@@ -84,7 +98,8 @@ class AuditService:
         target_url = audit.target_url
         selected_modules = audit.selected_modules or [
             "PERFORMANCE", "SEO", "ACCESSIBILITY", "SECURITY_PASSIVE",
-            "RESPONSIVE", "TECHNICAL_HEALTH", "TECHNOLOGY", "THIRD_PARTY"
+            "RESPONSIVE", "TECHNICAL_HEALTH", "TECHNOLOGY", "THIRD_PARTY",
+            "VISUAL"
         ]
 
         t_start = time.time()
@@ -151,21 +166,34 @@ class AuditService:
             ordered_modules = [
                 ("SEO", "SEO Intelligence & Meta", SEOEngine),
                 ("SECURITY_PASSIVE", "Passive Security & TLS Posture", PassiveSecurityEngine),
+                ("SECURITY_ACTIVE", "Active Security & Vulnerability Probes", AuthorizedActiveSecurityEngine),
                 ("PERFORMANCE", "Core Web Vitals & Performance", PerformanceEngine),
                 ("ACCESSIBILITY", "axe-core Accessibility (WCAG 2.1/2.2 AA)", AccessibilityEngine),
                 ("RESPONSIVE", "Responsive Viewports & Overflow", ResponsiveEngine),
+                ("VISUAL", "Visual Regression & Layout Stability", VisualRegressionEngine),
                 ("TECHNICAL_HEALTH", "Technical Health & Diagnostics", None),
                 ("TECHNOLOGY", "Technology Stack Detection", TechnologyEngine),
                 ("THIRD_PARTY", "Third-Party Assets & Impact", ThirdPartyEngine),
+                ("LOAF_INP", "LoAF & INP Script Attributor", LoAFEngine),
+                ("SECURITY_MAGECART", "Magecart & Exfiltration Sandbox", MagecartEngine),
+                ("CARBON_ESG", "Digital Carbon Footprint & Scope 3 ESG", CarbonEngine),
+                ("SECRET_HARVESTER", "Client Secret & Sourcemap Harvester", SecretsHarvesterEngine),
+                ("POST_QUANTUM_DNSSEC", "Post-Quantum Cryptography & DNSSEC Radar", PostQuantumDNSSECEngine),
+                ("GEO_AI", "Generative Engine Optimization (GEO)", GEOEngine),
+                ("ZERO_TRUST_PRIVACY", "Zero-Trust Privacy & Consent Evasion", ZeroTrustPrivacyEngine),
+                ("LAYOUT_DEFECTS", "AI Visual Semantic Layout Defect Detection", LayoutDefectsEngine),
+                ("USER_JOURNEY", "Synthetic Multi-Step User Journey Validator", SyntheticUserJourneyEngine),
+                ("CODE_REMEDIATION", "1-Click AST Code Remediation Generator", CodeRemediationEngine),
             ]
 
             active_modules = [
                 m for m in ordered_modules
-                if m[0] in selected_modules or (m[0] == "SECURITY_PASSIVE" and "SECURITY" in selected_modules)
+                if m[0] in selected_modules or (m[0] in ("SECURITY_PASSIVE", "SECURITY_ACTIVE") and "SECURITY" in selected_modules)
             ]
 
             total_mods = max(1, len(active_modules))
             span = 70.0 / total_mods
+            all_job_findings: List[Any] = list(crawl_res.findings)
 
             for idx, (mod_key, display_name, EngineCls) in enumerate(active_modules):
                 start_pct = int(20 + idx * span)
@@ -196,6 +224,80 @@ class AuditService:
                         AuditService._persist_findings(session, audit_id, primary_page_id, sec_res.findings)
                         mod_score = score_sec
 
+                    elif mod_key == "SECURITY_ACTIVE":
+                        _, hostname, _ = validate_target_url(target_url)
+
+                        # Check if target domain has verified ownership authorization
+                        # Scoped strictly to audit.project_id or projects owned by audit.user_id
+                        auth_rec: Optional[DomainAuthorization] = None
+
+                        if audit.project_id:
+                            # 1. Project-scoped check
+                            auth_stmt = select(DomainAuthorization).where(
+                                DomainAuthorization.project_id == audit.project_id,
+                                DomainAuthorization.domain == hostname,
+                                DomainAuthorization.status == VerificationStatus.VERIFIED
+                            )
+                            auth_res = await session.execute(auth_stmt)
+                            auth_rec = auth_res.scalars().first()
+
+                        if not auth_rec and audit.user_id:
+                            # 2. Creator-scoped check (projects owned by audit creator)
+                            auth_stmt_user = (
+                                select(DomainAuthorization)
+                                .join(Project, DomainAuthorization.project_id == Project.id)
+                                .where(
+                                    Project.owner_id == audit.user_id,
+                                    DomainAuthorization.domain == hostname,
+                                    DomainAuthorization.status == VerificationStatus.VERIFIED
+                                )
+                            )
+                            auth_res_user = await session.execute(auth_stmt_user)
+                            auth_rec = auth_res_user.scalars().first()
+
+                        # Validate expiration timestamp if a verified record was found
+                        is_verified = False
+                        auth_id = None
+                        if auth_rec:
+                            now_utc = datetime.now(timezone.utc)
+                            exp = auth_rec.expires_at
+                            if exp is not None:
+                                if exp.tzinfo is None:
+                                    exp = exp.replace(tzinfo=timezone.utc)
+                                if exp <= now_utc:
+                                    logger.warning(
+                                        f"Domain authorization #{auth_rec.id} for '{hostname}' has expired at {exp}."
+                                    )
+                                    auth_rec.status = VerificationStatus.EXPIRED
+                                    await session.flush()
+                                    is_verified = False
+                                    auth_id = None
+                                else:
+                                    is_verified = True
+                                    auth_id = auth_rec.id
+                            else:
+                                is_verified = True
+                                auth_id = auth_rec.id
+
+                        active_sec_engine = AuthorizedActiveSecurityEngine()
+                        active_res = await active_sec_engine.execute(
+                            target_url,
+                            {
+                                "is_verified_authorized": is_verified,
+                                "authorization_record_id": auth_id
+                            }
+                        )
+                        raw_results["SECURITY_ACTIVE"] = active_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, active_res.findings)
+                        mod_score = active_res.score
+
+                        # If active security is authorized and produces a valid score, update/combine security score
+                        if active_res.score is not None:
+                            if score_sec is not None:
+                                score_sec = round((score_sec + active_res.score) / 2.0, 1)
+                            else:
+                                score_sec = active_res.score
+
                     elif mod_key == "PERFORMANCE":
                         perf_engine = PerformanceEngine()
                         perf_res = await perf_engine.execute(target_url, {"device_profile": audit.device_profile.value})
@@ -219,6 +321,21 @@ class AuditService:
                         AuditService._persist_findings(session, audit_id, primary_page_id, resp_res.findings)
                         mod_score = resp_res.score
 
+                    elif mod_key == "VISUAL":
+                        vis_engine = VisualRegressionEngine()
+                        vis_res = await vis_engine.execute(
+                            target_url,
+                            {
+                                "audit_id": audit_id,
+                                "project_id": audit.project_id,
+                                "device_profile": audit.device_profile.value if hasattr(audit.device_profile, "value") else str(audit.device_profile),
+                                "session": session,
+                            }
+                        )
+                        raw_results["VISUAL"] = vis_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, vis_res.findings)
+                        mod_score = vis_res.score
+
                     elif mod_key == "TECHNICAL_HEALTH":
                         score_tech = score_tech or 100.0
                         mod_score = score_tech
@@ -236,6 +353,82 @@ class AuditService:
                         raw_results["THIRD_PARTY"] = tp_res.raw_evidence
                         AuditService._persist_findings(session, audit_id, primary_page_id, tp_res.findings)
                         mod_score = tp_res.score
+
+                    elif mod_key == "LOAF_INP":
+                        loaf_engine = LoAFEngine()
+                        loaf_res = await loaf_engine.execute(target_url, {})
+                        raw_results["LOAF_INP"] = loaf_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, loaf_res.findings)
+                        mod_score = loaf_res.score
+
+                    elif mod_key == "SECURITY_MAGECART":
+                        magecart_engine = MagecartEngine()
+                        magecart_res = await magecart_engine.execute(target_url, {})
+                        raw_results["SECURITY_MAGECART"] = magecart_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, magecart_res.findings)
+                        mod_score = magecart_res.score
+
+                    elif mod_key == "CARBON_ESG":
+                        carbon_engine = CarbonEngine()
+                        carbon_res = await carbon_engine.execute(target_url, {})
+                        raw_results["CARBON_ESG"] = carbon_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, carbon_res.findings)
+                        mod_score = carbon_res.score
+
+                    elif mod_key == "SECRET_HARVESTER":
+                        secret_engine = SecretsHarvesterEngine()
+                        secret_res = await secret_engine.execute(target_url, {})
+                        raw_results["SECRET_HARVESTER"] = secret_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, secret_res.findings)
+                        mod_score = secret_res.score
+
+                    elif mod_key == "POST_QUANTUM_DNSSEC":
+                        pq_engine = PostQuantumDNSSECEngine()
+                        pq_res = await pq_engine.execute(target_url, {})
+                        raw_results["POST_QUANTUM_DNSSEC"] = pq_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, pq_res.findings)
+                        all_job_findings.extend(pq_res.findings)
+                        mod_score = pq_res.score
+
+                    elif mod_key == "GEO_AI":
+                        geo_engine = GEOEngine()
+                        geo_res = await geo_engine.execute(target_url, {})
+                        raw_results["GEO_AI"] = geo_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, geo_res.findings)
+                        all_job_findings.extend(geo_res.findings)
+                        mod_score = geo_res.score
+
+                    elif mod_key == "ZERO_TRUST_PRIVACY":
+                        priv_engine = ZeroTrustPrivacyEngine()
+                        priv_res = await priv_engine.execute(target_url, {})
+                        raw_results["ZERO_TRUST_PRIVACY"] = priv_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, priv_res.findings)
+                        all_job_findings.extend(priv_res.findings)
+                        mod_score = priv_res.score
+
+                    elif mod_key == "LAYOUT_DEFECTS":
+                        layout_engine = LayoutDefectsEngine()
+                        layout_res = await layout_engine.execute(target_url, {})
+                        raw_results["LAYOUT_DEFECTS"] = layout_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, layout_res.findings)
+                        all_job_findings.extend(layout_res.findings)
+                        mod_score = layout_res.score
+
+                    elif mod_key == "USER_JOURNEY":
+                        journey_engine = SyntheticUserJourneyEngine()
+                        journey_res = await journey_engine.execute(target_url, {})
+                        raw_results["USER_JOURNEY"] = journey_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, journey_res.findings)
+                        all_job_findings.extend(journey_res.findings)
+                        mod_score = journey_res.score
+
+                    elif mod_key == "CODE_REMEDIATION":
+                        remed_engine = CodeRemediationEngine()
+                        remed_res = await remed_engine.execute(target_url, {}, all_findings=all_job_findings)
+                        raw_results["CODE_REMEDIATION"] = remed_res.raw_evidence
+                        AuditService._persist_findings(session, audit_id, primary_page_id, remed_res.findings)
+                        all_job_findings.extend(remed_res.findings)
+                        mod_score = remed_res.score
 
                 except Exception as mod_err:
                     logger.error(f"Module {mod_key} non-fatal error: {mod_err}")

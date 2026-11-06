@@ -122,7 +122,8 @@ class AuditCreate(BaseModel):
     device_profile: DeviceProfile = DeviceProfile.BOTH
     selected_modules: List[str] = Field(default_factory=lambda: [
         "PERFORMANCE", "SEO", "ACCESSIBILITY", "SECURITY_PASSIVE",
-        "RESPONSIVE", "TECHNICAL_HEALTH", "TECHNOLOGY", "THIRD_PARTY"
+        "RESPONSIVE", "TECHNICAL_HEALTH", "TECHNOLOGY", "THIRD_PARTY",
+        "VISUAL"
     ])
     max_pages: Optional[int] = 50
     max_depth: Optional[int] = 3
@@ -238,4 +239,117 @@ class ScheduleResponse(BaseModel):
     next_run_at: Optional[datetime] = None
     alert_on_regression: bool
     created_at: datetime
+
+
+# --- Visual Regression ---
+class ViewportVisualDiff(BaseModel):
+    width: int
+    height: int
+    current_url: Optional[str] = None
+    baseline_url: Optional[str] = None
+    diff_url: Optional[str] = None
+    mismatch_percentage: float = 0.0
+    diff_pixels: int = 0
+    total_pixels: int = 0
+    has_baseline: bool = False
+
+
+class VisualRegressionResponse(BaseModel):
+    audit_id: int
+    target_url: str
+    baseline_audit_id: Optional[int] = None
+    baseline_established: bool = False
+    score: Optional[float] = None
+    overall_mismatch_percentage: float = 0.0
+    viewports: Dict[str, ViewportVisualDiff] = Field(default_factory=dict)
+
+
+# --- Integrations (API Keys & Webhooks) ---
+class ApiKeyCreate(BaseModel):
+    label: str = Field(min_length=1, max_length=255, description="Descriptive label for this API key")
+    expires_in_days: Optional[int] = Field(default=365, ge=1, le=3650, description="Validity window in days (default 365, null for non-expiring)")
+
+
+class ApiKeyResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    label: str
+    prefix: str
+    is_active: bool
+    expires_at: Optional[datetime] = None
+    created_at: datetime
+
+
+class ApiKeyCreatedResponse(ApiKeyResponse):
+    api_key: str = Field(description="Plaintext secret API key returned only once upon creation")
+
+
+class WebhookCreate(BaseModel):
+    project_id: Optional[int] = Field(default=None, description="Project ID to bind webhook to; if omitted, bound to default project")
+    url: str = Field(min_length=10, max_length=2048, description="Target destination URL for webhook events")
+    events: List[str] = Field(
+        default_factory=lambda: ["audit.completed", "regression.detected"],
+        description="Event types that trigger this webhook"
+    )
+
+
+class WebhookResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    project_id: int
+    url: str
+    events: List[str]
+    is_active: bool
+    created_at: datetime
+
+
+class WebhookCreatedResponse(WebhookResponse):
+    secret: str = Field(description="HMAC secret key returned only once upon creation for signature verification")
+
+
+class WebhookTestResponse(BaseModel):
+    success: bool
+    status_code: Optional[int] = None
+    response_time_ms: Optional[int] = None
+    message: str
+
+
+# --- Team Management ---
+class TeamMemberResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
+    full_name: Optional[str] = None
+    role: UserRole
+    is_active: bool
+    created_at: datetime
+    initial_password: Optional[str] = Field(
+        default=None,
+        description="Populated only upon initial member invitation generation."
+    )
+
+
+class TeamMemberListResponse(BaseModel):
+    items: List[TeamMemberResponse]
+    total: int
+
+
+class TeamInviteRequest(BaseModel):
+    email: EmailStr
+    full_name: Optional[str] = None
+    role: UserRole = Field(
+        default=UserRole.DEVELOPER,
+        description="Initial role assignment (OWNER, ADMIN, DEVELOPER, VIEWER)."
+    )
+
+
+class TeamRoleUpdateRequest(BaseModel):
+    role: UserRole = Field(
+        ...,
+        description="New role to assign to the workspace member."
+    )
 

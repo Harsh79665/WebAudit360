@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebAudit 360</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="brand">
+        <span class="brand-icon">🌐</span>
+        <span class="brand-name">WebAudit <strong>360</strong></span>
+      </div>
+      <button id="btn-settings-toggle" class="icon-btn" title="API Settings">⚙️</button>
+    </header>
+
+    <!-- Settings Drawer (Hidden by default) -->
+    <div id="settings-panel" class="settings-drawer" style="display: none;">
+      <label class="form-label" for="api-url-input">WebAudit 360 API Base URL</label>
+      <input type="url" id="api-url-input" class="form-input" value="http://localhost:8000" placeholder="http://localhost:8000">
+      
+      <label class="form-label" for="api-key-input" style="margin-top: 8px;">API Key (Bearer)</label>
+      <input type="password" id="api-key-input" class="form-input" placeholder="w360_live_...">
+      
+      <button id="btn-save-settings" class="btn btn-secondary btn-sm" style="margin-top: 8px; width: 100%;">Save Settings</button>
+    </div>
+
+    <!-- Active Tab Target -->
+    <div class="target-card">
+      <span class="label-xs">Active Target URL</span>
+      <div id="active-url-display" class="target-url">Resolving active tab...</div>
+    </div>
+
+    <!-- Audit Action -->
+    <div class="action-section">
+      <button id="btn-start-audit" class="btn btn-primary" style="width: 100%;">
+        <span>⚡ Launch Instant Audit</span>
+      </button>
+    </div>
+
+    <!-- Status / Progress State -->
+    <div id="progress-container" class="progress-box" style="display: none;">
+      <div class="progress-bar-bg">
+        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 10%;"></div>
+      </div>
+      <div id="progress-message" class="progress-msg">Initializing scan...</div>
+    </div>
+
+    <!-- Results Overview -->
+    <div id="results-container" class="results-box" style="display: none;">
+      <div class="score-row">
+        <div>
+          <span class="label-xs">Overall Health Rating</span>
+          <div id="result-label" class="rating-label">Excellent</div>
+        </div>
+        <div id="result-score" class="score-display">--</div>
+      </div>
+
+      <div class="category-grid">
+        <div class="category-pill">
+          <span class="cat-name">Perf</span>
+          <span id="score-perf" class="cat-val">--</span>
+        </div>
+        <div class="category-pill">
+          <span class="cat-name">SEO</span>
+          <span id="score-seo" class="cat-val">--</span>
+        </div>
+        <div class="category-pill">
+          <span class="cat-name">A11y</span>
+          <span id="score-a11y" class="cat-val">--</span>
+        </div>
+        <div class="category-pill">
+          <span class="cat-name">Sec</span>
+          <span id="score-sec" class="cat-val">--</span>
+        </div>
+      </div>
+
+      <a id="link-full-report" href="#" target="_blank" class="full-report-btn">
+        <span>Open Comprehensive Report in Dashboard &rarr;</span>
+      </a>
+    </div>
+
+    <footer class="popup-footer">
+      <span>WebAudit 360 &bull; Harsh Patel</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

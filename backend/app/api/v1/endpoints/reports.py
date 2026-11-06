@@ -61,9 +61,25 @@ async def get_audit_report_json(audit_id: int, session: AsyncSession = Depends(g
     }
 
 
+from backend.app.services.pdf_service import PDFReportService, generate_report_html
+
+
 @router.get("/{audit_id}/pdf")
 async def get_audit_report_pdf(audit_id: int, session: AsyncSession = Depends(get_db)):
-    """Generates a publication-grade HTML printable report for the audit."""
+    """Generates and streams a publication-grade binary PDF report for the audit."""
+    try:
+        pdf_bytes = await PDFReportService.render_audit_pdf(audit_id, session)
+        headers = {
+            "Content-Disposition": f'attachment; filename="webaudit360_report_{audit_id}.pdf"'
+        }
+        return Response(content=pdf_bytes, media_type="application/pdf", headers=headers)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Audit not found.")
+
+
+@router.get("/{audit_id}/html", response_class=HTMLResponse)
+async def get_audit_report_html(audit_id: int, session: AsyncSession = Depends(get_db)):
+    """Renders printable HTML view of the audit report."""
     result = await session.execute(select(Audit).where(Audit.id == audit_id))
     audit = result.scalars().first()
     if not audit:
@@ -71,58 +87,5 @@ async def get_audit_report_pdf(audit_id: int, session: AsyncSession = Depends(ge
 
     findings_res = await session.execute(select(AuditFinding).where(AuditFinding.audit_id == audit_id))
     findings = findings_res.scalars().all()
-
-    overall_label = get_score_label(audit.overall_score)
-
-    html_content = f"""<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Audit Report — {audit.target_url} — WebAudit 360</title>
-  <style>
-    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #0f172a; line-height: 1.5; }}
-    .header {{ border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; }}
-    .brand {{ font-size: 24px; font-weight: 800; color: #2563eb; }}
-    .title {{ font-size: 28px; font-weight: 800; margin: 10px 0; }}
-    .scores-grid {{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin: 30px 0; text-align: center; }}
-    .score-card {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }}
-    .score-val {{ font-size: 32px; font-weight: 800; color: #2563eb; }}
-    .finding-card {{ border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 15px; margin-bottom: 15px; }}
-    .finding-title {{ font-weight: 700; font-size: 16px; margin-bottom: 5px; }}
-    .footer {{ margin-top: 50px; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; }}
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="brand">WebAudit 360</div>
-    <div class="title">Website Intelligence Audit Report</div>
-    <div>Target: <strong>{audit.target_url}</strong> &bull; Scanned: {audit.created_at.strftime('%Y-%m-%d %H:%M:%S UTC')}</div>
-  </div>
-
-  <h2>Overall Health Rating: {round(audit.overall_score or 0)} / 100 ({overall_label})</h2>
-  <div class="scores-grid">
-    <div class="score-card"><div class="score-val">{round(audit.score_performance or 0)}</div><div>Performance</div></div>
-    <div class="score-card"><div class="score-val">{round(audit.score_seo or 0)}</div><div>SEO</div></div>
-    <div class="score-card"><div class="score-val">{round(audit.score_accessibility or 0)}</div><div>Accessibility</div></div>
-    <div class="score-card"><div class="score-val">{round(audit.score_security or 0)}</div><div>Security</div></div>
-    <div class="score-card"><div class="score-val">{round(audit.score_technical or 0)}</div><div>Best Practices</div></div>
-  </div>
-
-  <h3>Actionable Technical Findings ({len(findings)})</h3>
-  {''.join([f'''
-    <div class="finding-card">
-      <div class="finding-title">{f.title} <span style="font-size: 12px; color: #dc2626;">[{f.severity.value}]</span></div>
-      <div>{f.description}</div>
-      {f'<div style="margin-top: 8px; font-weight: 600; color: #2563eb;">Fix: {f.recommendation}</div>' if f.recommendation else ''}
-    </div>
-  ''' for f in findings])}
-
-  <div class="footer">
-    &copy; 2026 WebAudit 360 &bull; Platform Created by Harsh Patel. Traceable Evidence & No-Fake-Data Policy Enforced.
-  </div>
-</body>
-</html>
-"""
-
-    return HTMLResponse(content=html_content)
+    return HTMLResponse(content=generate_report_html(audit, findings))
 

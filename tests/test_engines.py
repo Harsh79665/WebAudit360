@@ -35,6 +35,25 @@ async def test_active_security_engine_blocks_unauthorized():
 
 
 @pytest.mark.asyncio
+async def test_active_security_engine_authorized_execution():
+    """Verify authorized active security execution executes real probes and calculates dynamic score."""
+    engine = AuthorizedActiveSecurityEngine()
+    result = await engine.execute(
+        "https://example.com",
+        config={"is_verified_authorized": True, "authorization_record_id": 999}
+    )
+    assert result.status == EngineStatus.SUCCESS
+    assert result.score is not None
+    assert 0.0 <= result.score <= 100.0
+    assert "probes" in result.raw_evidence
+    assert "http_methods" in result.raw_evidence["probes"]
+    assert "cors" in result.raw_evidence["probes"]
+    assert "sensitive_files" in result.raw_evidence["probes"]
+    assert "open_redirect" in result.raw_evidence["probes"]
+    assert "clickjacking" in result.raw_evidence["probes"]
+
+
+@pytest.mark.asyncio
 async def test_seo_engine_execution():
     """Verify SEO engine executes and generates structured findings."""
     engine = SEOEngine()

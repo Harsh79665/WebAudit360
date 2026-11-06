@@ -78,10 +78,14 @@ export async function loadDashboardData() {
           <tbody>
     `;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = parseInt(urlParams.get("id"), 10);
+
     audits.forEach((audit) => {
       const scoreObj = getScoreDetails(audit.overall_score);
+      const isHighlight = requestedId && audit.id === requestedId;
       tableHtml += `
-        <tr>
+        <tr style="${isHighlight ? 'background: var(--accent-glow, rgba(6, 182, 212, 0.12));' : ''}">
           <td>
             <div class="table-target-cell">
               <span data-icon="globe"></span>

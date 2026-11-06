@@ -1,13 +1,52 @@
-# Python
+# ==============================================================================
+# WebAudit 360 — Git Ignore Configuration
+# ==============================================================================
+
+# Environment Variables & Secrets
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+!.env.example
+
+# Cryptographic Keys, Certificates & Credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.pkcs12
+*.crt
+*.cer
+*.der
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+*.secret
+credentials.json
+client_secret*.json
+
+# Databases & Persistence
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+webaudit360.db
+test_ci.db
+*.sql.gz
+*.dump
+
+# Python Bytecode & Runtime Cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-.venv/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -24,7 +63,15 @@ wheels/
 .installed.cfg
 *.egg
 
-# Pytest / Coverage
+# Virtual Environments
+env/
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing, Quality & Coverage
 .pytest_cache/
 .coverage
 .coverage.*
@@ -32,40 +79,46 @@ htmlcov/
 *.cover
 *.py,cover
 coverage.xml
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+.tox/
+.nox/
 
-# Database
-*.db
-*.sqlite3
-*.sqlite
-*.db-journal
-*.db-wal
-*.db-shm
-webaudit360.db
-test_ci.db
-
-# Environment variables
-.env
-!.env.example
-
-# Node / Lighthouse / Playwright
+# Node.js, Frontend & Browser Automation
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 .playwright/
 playwright-report/
 test-results/
+.lighthouseci/
 
-# Operating System & IDE
+# Storage, Logs, Reports & Evidence
+*.log
+logs/
+reports/
+evidence/
+downloads/
+storage_data/
+backend/app/storage_data/
+*.tmp
+*.temp
+
+# Operating System & IDE Configuration
 .DS_Store
 Thumbs.db
+desktop.ini
+ehthumbs.db
 .vscode/
 .idea/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
 
-# Artifacts
-reports/
-evidence/
-downloads/
-
+# AI Agent Sessions & Workspaces
+.agents/
+.gemini/

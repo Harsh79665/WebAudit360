@@ -21,17 +21,31 @@ async function populateAuditSelector() {
   if (!auditSelect) return;
 
   try {
-    const data = await apiClient.get("/audits?limit=20").catch(() => ({ items: [] }));
-    const audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
+    const data = await apiClient.get("/audits?limit=50").catch(() => ({ items: [] }));
+    let audits = (data.items || []).filter(a => !a.target_url.includes("example.com"));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = parseInt(urlParams.get("id"), 10);
+
+    let targetAudit = !isNaN(requestedId) && requestedId > 0 ? audits.find(a => a.id === requestedId) : null;
+    if (!targetAudit && !isNaN(requestedId) && requestedId > 0) {
+      try {
+        const direct = await apiClient.get(`/audits/${requestedId}`);
+        if (direct && direct.id) {
+          targetAudit = direct;
+          audits.unshift(direct);
+        }
+      } catch (_) {}
+    }
 
     if (audits.length === 0) {
       auditSelect.innerHTML = `<option value="">No audits available</option>`;
       return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const requestedId = parseInt(urlParams.get("id"), 10);
-    const targetAudit = audits.find(a => a.id === requestedId) || audits[0];
+    if (!targetAudit) {
+      targetAudit = audits[0];
+    }
 
     auditSelect.innerHTML = audits.map(a => `
       <option value="${a.id}" ${a.id === targetAudit.id ? 'selected' : ''}>${escapeHtml(a.target_url)} - ${formatDate(a.created_at)}</option>
@@ -66,6 +80,49 @@ export async function loadSecurityData(auditId) {
     const hasXcto = !!headers["x-content-type-options"];
     const hasRefPol = !!headers["referrer-policy"];
 
+    const secActiveRaw = audit.raw_results?.SECURITY_ACTIVE || {};
+    const isAuthorized = secActiveRaw.authorized === true;
+    const activeScore = secActiveRaw.score;
+    const activeProbes = secActiveRaw.probes || {};
+
+    // Active Gatekeeper Card
+    let activeCardHtml = "";
+    if (isAuthorized) {
+      const activeScoreObj = getScoreDetails(activeScore);
+      activeCardHtml = `
+        <div class="card glass-panel" style="padding: var(--space-lg);">
+          <div class="flex items-center justify-between" style="margin-bottom: 6px;">
+            <span class="text-xs text-muted" style="text-transform: uppercase;">Active Testing Engine</span>
+            <span class="badge score-good">VERIFIED & PROBED</span>
+          </div>
+          <div style="font-size: 1.75rem; font-weight: 800; margin: 4px 0;" class="${activeScoreObj.class}">
+            ${activeScore !== null ? Math.round(activeScore) : '100'} <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">/ 100</span>
+          </div>
+          <p class="text-xs text-muted">
+            5 non-destructive probes executed under cryptographic domain verification.
+          </p>
+        </div>
+      `;
+    } else {
+      activeCardHtml = `
+        <div class="card glass-panel" style="padding: var(--space-lg);">
+          <div class="flex items-center justify-between" style="margin-bottom: 6px;">
+            <span class="text-xs text-muted" style="text-transform: uppercase;">Active Testing Engine</span>
+            <span class="badge score-warning">AUTHORIZATION REQUIRED</span>
+          </div>
+          <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-cyan); margin: 6px 0;">
+            Active Probes Blocked
+          </div>
+          <p class="text-xs text-muted" style="margin-bottom: var(--space-sm);">
+            Domain verification required before active non-destructive vulnerability assessments can execute.
+          </p>
+          <button class="btn btn-secondary btn-sm" onclick="window.requestDomainAuth('${encodeURIComponent(audit.target_url)}')">
+            <span data-icon="shield"></span> Verify Domain Ownership
+          </button>
+        </div>
+      `;
+    }
+
     let html = `
       <div class="grid grid-3" style="gap: var(--space-md); margin-bottom: var(--space-xl);">
         <div class="card glass-panel" style="padding: var(--space-lg); text-align: center;">
@@ -86,15 +143,7 @@ export async function loadSecurityData(auditId) {
           </p>
         </div>
 
-        <div class="card glass-panel" style="padding: var(--space-lg);">
-          <div class="text-xs text-muted" style="text-transform: uppercase; margin-bottom: 6px;">Active Testing Gatekeeper</div>
-          <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-cyan);">
-            Cryptographic Authorization Required
-          </div>
-          <p class="text-xs text-muted" style="margin-top: 6px;">
-            Active non-destructive probing requires a verified DNS TXT or HTTP token challenge.
-          </p>
-        </div>
+        ${activeCardHtml}
       </div>
 
       <!-- Real Response Headers Matrix -->
@@ -129,7 +178,43 @@ export async function loadSecurityData(auditId) {
           </div>
         </div>
       </div>
+    `;
 
+    // Active Security Probes Matrix (rendered when authorized)
+    if (isAuthorized && Object.keys(activeProbes).length > 0) {
+      const probeItems = [
+        { name: "HTTP Method Tampering", key: "http_methods", desc: "OPTIONS, TRACE, TRACK, PUT, DELETE checks" },
+        { name: "CORS Credential Reflection", key: "cors", desc: "Arbitrary and null Origin reflection checks" },
+        { name: "Sensitive File Exposure", key: "sensitive_files", desc: "/.env, /.git/HEAD, security.txt, backups" },
+        { name: "Open Redirect Reflection", key: "open_redirect", desc: "Query parameter redirect validation" },
+        { name: "Frameability & Clickjacking", key: "clickjacking", desc: "X-Frame-Options and CSP frame-ancestors" }
+      ];
+
+      html += `
+        <div class="glass-panel" style="padding: var(--space-lg); margin-bottom: var(--space-xl);">
+          <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-md); color: var(--text-primary);">
+            <span data-icon="zap"></span> Active Non-Destructive Probes Execution Matrix
+          </h4>
+          <div class="grid grid-3 text-xs" style="gap: var(--space-md);">
+            ${probeItems.map(p => {
+              const probeData = activeProbes[p.key] || {};
+              const isPass = probeData.status === "PASS";
+              return `
+                <div class="card glass-panel" style="padding: var(--space-md);">
+                  <div class="flex items-center justify-between" style="margin-bottom: 4px;">
+                    <div style="font-weight: 700;">${escapeHtml(p.name)}</div>
+                    <span class="badge ${isPass ? 'score-good' : 'score-poor'}">${isPass ? 'PASS' : 'VULNERABILITY'}</span>
+                  </div>
+                  <p class="text-xs text-muted" style="margin-bottom: 0;">${escapeHtml(p.desc)}</p>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    html += `
       <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
         <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
           <h3 style="font-size: 1.25rem; font-weight: 700;">Security Findings & Header Diagnostics</h3>
@@ -143,7 +228,7 @@ export async function loadSecurityData(auditId) {
       html += `
         <div class="empty-state">
           <div class="empty-state-icon"><span data-icon="shield"></span></div>
-          <h3 class="empty-state-title">No Security Header Deficiencies Detected</h3>
+          <h3 class="empty-state-title">No Security Deficiencies Detected</h3>
           <p class="empty-state-desc">The web server enforces proper TLS transport, defensive framing rules, and mime-type protection.</p>
         </div>
       `;
@@ -171,7 +256,7 @@ export async function loadSecurityData(auditId) {
             </td>
             <td>
               <code style="font-size: 0.75rem; background: var(--bg-surface); padding: 4px 8px; border-radius: 4px; display: block; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                ${escapeHtml(f.evidence_snippet || f.description || 'Response Header Observation')}
+                ${escapeHtml(f.evidence_snippet || f.description || 'Observation details')}
               </code>
             </td>
             <td>

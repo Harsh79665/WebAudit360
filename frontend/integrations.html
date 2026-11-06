@@ -138,16 +138,20 @@
 
         <!-- API Keys Management -->
         <div class="glass-panel" style="padding: var(--space-xl); margin-bottom: var(--space-xl);">
-          <div class="flex items-center justify-between" style="margin-bottom: var(--space-md);">
+          <div class="flex items-center justify-between" style="margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-md);">
             <div>
               <h3 style="font-size: 1.15rem; font-weight: 700;">Scoped API Keys</h3>
-              <p class="text-xs text-muted">Use API keys with the <code>Authorization: Bearer &lt;key&gt;</code> header for CLI or Flutter apps.</p>
+              <p class="text-xs text-muted">Use API keys with the <code>Authorization: Bearer &lt;key&gt;</code> header for CI/CD, CLI, or Flutter apps.</p>
             </div>
-            <button id="generate-api-key-btn" class="btn btn-primary btn-sm">
-              <span data-icon="plus"></span> Generate New API Key
-            </button>
+            <div class="flex items-center gap-sm" style="flex-wrap: wrap;">
+              <input type="text" id="api-key-label-input" class="form-input" placeholder="Key Label (e.g. GitHub Actions)" style="max-width: 240px;">
+              <button id="generate-api-key-btn" class="btn btn-primary btn-sm">
+                <span data-icon="plus"></span> Generate Key
+              </button>
+            </div>
           </div>
           <div id="api-key-display"></div>
+          <div id="api-keys-table-container" style="margin-top: var(--space-lg);"></div>
         </div>
 
         <!-- Webhook Configuration -->
@@ -165,6 +169,8 @@
               </button>
             </div>
           </form>
+          <div id="webhook-secret-display"></div>
+          <div id="webhooks-table-container" style="margin-top: var(--space-lg);"></div>
         </div>
       </div>
 

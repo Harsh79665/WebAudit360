@@ -146,15 +146,11 @@
                   <th>Email</th>
                   <th>Workspace Role</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Harsh Patel</strong></td>
-                  <td>creator@webaudit360.io</td>
-                  <td><span class="badge" style="background:var(--accent-glow); color:var(--accent-primary); font-weight:700;">OWNER</span></td>
-                  <td><span class="badge">ACTIVE</span></td>
-                </tr>
+              <tbody id="team-members-tbody">
+                <!-- Dynamically rendered by frontend/js/team.js -->
               </tbody>
             </table>
           </div>
@@ -162,25 +158,30 @@
 
         <div class="glass-panel" style="padding: var(--space-xl);">
           <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: var(--space-md);">Invite Team Member</h3>
-          <form onsubmit="event.preventDefault(); alert('Invite link generated! New member will join with requested role.'); this.reset();" class="grid grid-3" style="gap: var(--space-md); align-items: end;">
+          <form id="invite-member-form" class="grid grid-4" style="gap: var(--space-md); align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="invite-name" class="form-input" placeholder="Alex Morgan">
+            </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Email Address</label>
-              <input type="email" class="form-input" placeholder="colleague@agency.com" required>
+              <input type="email" id="invite-email" class="form-input" placeholder="colleague@agency.com" required>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Role Assignment</label>
-              <select class="form-select">
+              <select id="invite-role" class="form-select">
                 <option value="DEVELOPER" selected>Developer (Audits, Retests, Issues)</option>
                 <option value="ADMIN">Admin (Projects, Integrations)</option>
                 <option value="VIEWER">Viewer (Read-Only Reports)</option>
               </select>
             </div>
             <div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <button type="submit" id="invite-submit-btn" class="btn btn-primary" style="width: 100%;">
                 <span data-icon="plus"></span> Send Invitation
               </button>
             </div>
           </form>
+          <div id="invite-result-container" style="display: none;"></div>
         </div>
       </div>
 
@@ -194,11 +195,13 @@
     import { renderIcons } from "./js/icons.js";
     import { initTheme } from "./js/theme.js";
     import { initNavigation } from "./js/navigation.js";
+    import { initTeamView } from "./js/team.js";
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       renderIcons();
       initTheme();
       initNavigation();
+      await initTeamView();
     });
   </script>
 </body>

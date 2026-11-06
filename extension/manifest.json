@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "WebAudit 360 — Real-Time Website Intelligence",
+  "version": "1.0.0",
+  "description": "Trigger instant, evidence-based website audits, SEO checks, and security scans directly from your browser toolbar.",
+  "author": "Harsh Patel",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Audit Active Page with WebAudit 360"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
+}
